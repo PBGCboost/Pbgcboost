@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Commande PBGCboost</title>
+
+<style>
+body{
+font-family:Arial;
+text-align:center;
+background:#f5f5f5;
+padding:30px;
+}
+
+input, select, button{
+width:90%;
+padding:12px;
+margin:8px;
+border-radius:8px;
+}
+
+button{
+background:#1877f2;
+color:white;
+border:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Commande PBGCboost</h1>
+
+<form>
+
+<select required>
+<option>Choisir le service</option>
+<option>Boostage Facebook</option>
+<option>Boostage TikTok</option>
+<option>Boostage YouTube</option>
+<option>Boostage Instagram</option>
+</select>
+
+<input type="number" min="200" max="10000" placeholder="Quantité (200 à 10000)" required>
+
+<input type="url" placeholder="Lien à booster" required>
+
+<button type="submit">
+Envoyer la commande
+</button>
+
+</form>
+
+</body>
+</html>
