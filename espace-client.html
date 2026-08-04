@@ -2,71 +2,135 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Espace client PBGCboost</title>
+<title>Espace client - PBGCboost</title>
 
 <style>
 body{
-font-family:Arial;
-background:#f5f5f5;
-text-align:center;
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+margin:0;
+}
+
+header{
+background:#1877f2;
+color:white;
 padding:20px;
+text-align:center;
+}
+
+nav a{
+color:white;
+margin:8px;
+text-decoration:none;
+}
+
+.container{
+padding:20px;
+text-align:center;
 }
 
 .card{
 background:white;
-padding:15px;
-margin:15px;
-border-radius:10px;
+margin:15px auto;
+padding:20px;
+border-radius:12px;
+max-width:500px;
+box-shadow:0 2px 8px #ccc;
 }
 
-button, a{
+button{
 background:#1877f2;
 color:white;
-padding:12px 20px;
-border-radius:8px;
-text-decoration:none;
+padding:12px 25px;
 border:none;
+border-radius:8px;
+font-size:16px;
 }
+
+.whatsapp{
+background:#25D366;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<h1>Bienvenue dans votre espace client</h1>
+<header>
+<h1>PBGCboost</h1>
+<p>Espace client</p>
 
+<nav>
+<a href="espace-client.html">Accueil</a>
+<a href="commande.html">Commande</a>
+</nav>
+
+</header>
+
+
+<div class="container">
+
+<h2>Bienvenue dans votre espace client</h2>
+
+<div class="card">
 <h2>Nos services</h2>
 
-<div class="card">
-<h3>Facebook</h3>
-<p>Boostage de visibilité Facebook</p>
+<p>📘 Boostage Facebook</p>
+<p>🎵 Boostage TikTok</p>
+<p>▶️ Boostage YouTube</p>
+<p>📸 Boostage Instagram</p>
+<p>✈️ Boostage Telegram</p>
+
 </div>
 
-<div class="card">
-<h3>TikTok</h3>
-<p>Boostage TikTok</p>
-</div>
 
 <div class="card">
-<h3>Instagram</h3>
-<p>Boostage Instagram</p>
-</div>
-
-<div class="card">
-<h3>YouTube</h3>
-<p>Boostage YouTube</p>
-</div>
 
 <h2>Nos tarifs</h2>
 
-<div class="card">
-<p>200 → Prix à définir</p>
-<p>500 → Prix à définir</p>
-<p>1000 → Prix à définir</p>
-<p>10000 → Prix à définir</p>
+<p>✅ 200 : 300 FCFA</p>
+<p>✅ 500 : 700 FCFA</p>
+<p>✅ 1 000 : 1 200 FCFA</p>
+<p>✅ 2 000 : 2 200 FCFA</p>
+<p>✅ 10 000 : 11 000 FCFA</p>
+
 </div>
 
-<a href="commande.html">Commander maintenant</a>
+
+<div class="card">
+
+<h2>Commander un boostage</h2>
+
+<p>
+Choisissez votre quantité et envoyez votre lien à booster.
+</p>
+
+<a href="commande.html">
+<button>
+Commander maintenant
+</button>
+</a>
+
+</div>
+
+
+<div class="card">
+
+<h2>Contact</h2>
+
+<p>WhatsApp : +229 90 29 75 37</p>
+
+<a href="https://wa.me/22990297537">
+<button class="whatsapp">
+Contacter WhatsApp
+</button>
+</a>
+
+</div>
+
+
+</div>
 
 </body>
   </html>
