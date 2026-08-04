@@ -2,17 +2,25 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Commande PBGCboost</title>
+<title>Commande - PBGCboost</title>
 
 <style>
 body{
 font-family:Arial;
+background:#f4f4f4;
 text-align:center;
-background:#f5f5f5;
-padding:30px;
+padding:20px;
 }
 
-input, select, button{
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+max-width:500px;
+margin:auto;
+}
+
+select,input,button{
 width:90%;
 padding:12px;
 margin:8px;
@@ -20,9 +28,10 @@ border-radius:8px;
 }
 
 button{
-background:#1877f2;
+background:#25D366;
 color:white;
 border:none;
+font-size:16px;
 }
 </style>
 
@@ -30,27 +39,72 @@ border:none;
 
 <body>
 
+<div class="card">
+
 <h1>Commande PBGCboost</h1>
 
-<form>
+<select id="service">
+<option>Choisir un service</option>
 
-<select required>
-<option>Choisir le service</option>
-<option>Boostage Facebook</option>
-<option>Boostage TikTok</option>
-<option>Boostage YouTube</option>
-<option>Boostage Instagram</option>
+<option>Facebook J'aime</option>
+<option>Facebook Abonnés</option>
+<option>TikTok J'aime</option>
+<option>TikTok Abonnés</option>
+<option>YouTube</option>
+<option>Instagram</option>
+<option>Telegram</option>
+
 </select>
 
-<input type="number" min="200" max="10000" placeholder="Quantité (200 à 10000)" required>
 
-<input type="url" placeholder="Lien à booster" required>
+<select id="quantite">
+<option>Choisir la quantité</option>
 
-<button type="submit">
-Envoyer la commande
+<option value="200">200</option>
+<option value="500">500</option>
+<option value="1000">1000</option>
+<option value="2000">2000</option>
+<option value="10000">10000</option>
+
+</select>
+
+
+<input id="lien" type="url" placeholder="Lien à booster">
+
+
+<button onclick="commander()">
+Commander via WhatsApp
 </button>
 
-</form>
+
+</div>
+
+
+<script>
+
+function commander(){
+
+let service=document.getElementById("service").value;
+let quantite=document.getElementById("quantite").value;
+let lien=document.getElementById("lien").value;
+
+
+let message =
+"Bonjour PBGCboost%0A%0A"+
+"Je souhaite commander :%0A"+
+"Service : "+service+"%0A"+
+"Quantité : "+quantite+"%0A"+
+"Lien : "+lien;
+
+
+window.open(
+"https://wa.me/22990297537?text="+message
+);
+
+}
+
+</script>
+
 
 </body>
-</html>
+  </html>
