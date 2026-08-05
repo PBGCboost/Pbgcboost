@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Espace client - PBGCboost</title>
 
 <style>
+
 body{
 font-family:Arial;
 background:#f4f4f4;
@@ -24,22 +29,28 @@ padding:20px;
 
 .card{
 background:white;
-margin:15px auto;
 padding:20px;
+margin:15px auto;
 border-radius:12px;
 max-width:600px;
 box-shadow:0 2px 8px #ccc;
 }
 
-h2{
-color:#1877f2;
+.service{
+display:block;
+background:#1877f2;
+color:white;
+padding:15px;
+margin:10px;
+border-radius:8px;
+text-decoration:none;
 }
 
 button{
-background:#1877f2;
+background:#d9534f;
 color:white;
 padding:12px 20px;
-border:0;
+border:none;
 border-radius:8px;
 }
 
@@ -47,131 +58,142 @@ border-radius:8px;
 
 </head>
 
+
 <body>
 
+
 <header>
+
 <h1>PBGCboost</h1>
+
 <p>Espace client</p>
+
+<button onclick="deconnexion()">
+Déconnexion
+</button>
+
 </header>
+
 
 
 <div class="container">
 
+
 <div class="card">
+
+<h2>Bienvenue dans votre espace client</h2>
+
+<p>
+Choisissez un service pour voir les tarifs.
+</p>
+
+</div>
+
+
+
+<div class="card">
+
 <h2>Nos services</h2>
 
-<p>📘 Facebook J'aime</p>
-<p>👥 Facebook Abonnés Profil/Page</p>
-<p>🎵 TikTok J'aime</p>
-<p>🎵 TikTok Abonnés</p>
-<p>▶️ YouTube</p>
-<p>📸 Instagram</p>
-<p>✈️ Telegram</p>
 
-</div>
-
-
-<div class="card">
-
-<h2>Facebook J'aime</h2>
-
-<p>200 j'aime : 300 FCFA</p>
-<p>500 j'aime : 700 FCFA</p>
-<p>1000 j'aime : 1300 FCFA</p>
-<p>2000 j'aime : 2500 FCFA</p>
-<p>10000 j'aime : 11000 FCFA</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>Facebook Abonnés Profil/Page</h2>
-
-<p>200 abonnés : 500 FCFA</p>
-<p>500 abonnés : 1000 FCFA</p>
-<p>1000 abonnés : 2000 FCFA</p>
-<p>2000 abonnés : 4000 FCFA</p>
-<p>10000 abonnés : 20000 FCFA</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>TikTok J'aime</h2>
-
-<p>200 j'aime : 500 FCFA</p>
-<p>500 j'aime : 1100 FCFA</p>
-<p>1000 j'aime : 2000 FCFA</p>
-<p>2000 j'aime : 4000 FCFA</p>
-<p>10000 j'aime : Disponible bientôt</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>TikTok Abonnés</h2>
-
-<p>200 abonnés : 600 FCFA</p>
-<p>500 abonnés : 1300 FCFA</p>
-<p>1000 abonnés : 2600 FCFA</p>
-<p>2000 abonnés : 5200 FCFA</p>
-<p>10000 abonnés : Disponible bientôt</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>YouTube</h2>
-
-<p>200 : 1000 FCFA</p>
-<p>500 : 2500 FCFA</p>
-<p>1000 : 5000 FCFA</p>
-<p>2000 : Disponible bientôt</p>
-<p>10000 : Disponible bientôt</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>Instagram</h2>
-
-<p>200 : 1000 FCFA</p>
-<p>500 : 2500 FCFA</p>
-<p>1000 : 5000 FCFA</p>
-<p>2000 : Disponible bientôt</p>
-<p>10000 : Disponible bientôt</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>Telegram</h2>
-
-<p>200 : 1000 FCFA</p>
-<p>500 : 2500 FCFA</p>
-<p>1000 : 5000 FCFA</p>
-<p>2000 : Disponible bientôt</p>
-<p>10000 : Disponible bientôt</p>
-
-</div>
-
-
-<div class="card">
-
-<a href="commande.html">
-<button>Commander maintenant</button>
+<a class="service" href="facebook-j'aime.html">
+📘 Facebook J'aime
 </a>
 
+
+<a class="service" href="facebook-abonnes.html">
+👥 Facebook Abonnés
+</a>
+
+
+<a class="service" href="tiktok-jaime.html">
+🎵 TikTok J'aime
+</a>
+
+
+<a class="service" href="tiktok-abonnes.html">
+🎵 TikTok Abonnés
+</a>
+
+
+<a class="service" href="youtube.html">
+▶️ YouTube
+</a>
+
+
+<a class="service" href="instagram.html">
+📸 Instagram
+</a>
+
+
+<a class="service" href="telegram.html">
+✈️ Telegram
+</a>
+
+
 </div>
 
 
 </div>
+
+
+
+<script type="module">
+
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+import {
+
+getAuth,
+
+signOut
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+
+authDomain: "pbgcboost.firebaseapp.com",
+
+projectId: "pbgcboost",
+
+storageBucket: "pbgcboost.firebasestorage.app",
+
+messagingSenderId: "1086041371195",
+
+appId: "1:1086041371195:web:3ade541590b85a5595221e"
+
+};
+
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+
+
+window.deconnexion = function(){
+
+signOut(auth)
+
+.then(()=>{
+
+window.location.href="connexion.html";
+
+});
+
+}
+
+
+</script>
+
+
 
 </body>
-  </html>
+</html>
