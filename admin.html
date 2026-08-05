@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration - PBGCboost</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+margin:0;
+padding:20px;
+}
+
+header{
+background:#1877f2;
+color:white;
+padding:20px;
+text-align:center;
+border-radius:10px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.card{
+background:white;
+margin-top:20px;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+button{
+background:#1877f2;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+margin-top:10px;
+}
+
+.commande{
+border:1px solid #ddd;
+padding:15px;
+margin-top:15px;
+border-radius:8px;
+background:#fafafa;
+}
+
+select{
+padding:8px;
+margin-top:10px;
+width:100%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<h1>PBGCboost</h1>
+
+<h2>Administration</h2>
+
+<p>Gestion des commandes clients</p>
+
+<button id="actualiser">
+Actualiser les commandes
+</button>
+
+</header>
+
+<div class="card">
+
+<h2>Liste des commandes</h2>
+
+<div id="listeCommandes">
+
+<p>Aucune commande chargée.</p>
+
+</div>
+
+</div>
+
+  </div>
+  <!-- Firebase -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { 
+getFirestore,
+collection,
+getDocs,
+updateDoc,
+doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// Configuration Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+  authDomain: "pbgcboost.firebaseapp.com",
+  projectId: "pbgcboost",
+  storageBucket: "pbgcboost.firebasestorage.app",
+  messagingSenderId: "1086041371195",
+  appId: "1:1086041371195:web:3ade541590b85a5595221e"
+};
+
+
+// Initialisation
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// Affichage commandes
+
+async function chargerCommandes(){
+
+const liste = document.getElementById("listeCommandes");
+
+liste.innerHTML = "Chargement...";
+
+
+const snapshot = await getDocs(collection(db,"commandes"));
+
+
+if(snapshot.empty){
+
+liste.innerHTML = "<p>Aucune commande disponible.</p>";
+
+return;
+
+}
+
+
+liste.innerHTML = "";
+
+
+snapshot.forEach((document)=>{
+
+
+const commande = document.data();
+
+const id = document.id;
+
+
+liste.innerHTML += `
+
+<div class="commande">
+
+<h3>Commande #${id}</h3>
+
+<p><b>Réseau :</b> ${commande.reseau}</p>
+
+<p><b>Quantité :</b> ${commande.quantite}</p>
+
+<p><b>Lien :</b> ${commande.lien}</p>
+
+<p><b>WhatsApp :</b> ${commande.whatsapp}</p>
+
+
+<label>Statut :</label>
+
+
+<select onchange="changerStatut('${id}',this.value)">
+
+<option ${commande.statut=="En attente"?"selected":""}>
+En attente
+</option>
+
+
+<option ${commande.statut=="En cours"?"selected":""}>
+En cours
+</option>
+
+
+<option ${commande.statut=="Terminé"?"selected":""}>
+Terminé
+</option>
+
+
+</select>
+
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+// Modification du statut
+
+window.changerStatut = async function(id,statut){
+
+const reference = doc(db,"commandes",id);
+
+
+await updateDoc(reference,{
+
+statut: statut
+
+});
+
+
+alert("Statut mis à jour");
+
+}
+
+
+// Bouton actualiser
+
+document
+.getElementById("actualiser")
+.onclick = chargerCommandes;
+
+
+// Charger automatiquement
+
+chargerCommandes();
+
+
+</script>
+
+
+</body>
+
+  </html>
