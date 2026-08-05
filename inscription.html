@@ -1,66 +1,148 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
-<title>Créer un compte - PBGCboost</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Inscription - PBGCboost</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:12px;
+max-width:400px;
+margin:auto;
+}
+
+input{
+width:90%;
+padding:12px;
+margin:10px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+background:#1877f2;
+color:white;
+padding:12px 25px;
+border:none;
+border-radius:8px;
+}
+
+a{
+text-decoration:none;
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-<h1>Créer un compte PBGCboost</h1>
 
-<input id="email" type="email" placeholder="Email"><br><br>
+<div class="card">
 
-<input id="password" type="password" placeholder="Mot de passe"><br><br>
+<h1>PBGCboost</h1>
 
-<button onclick="inscription()">Créer mon compte</button>
+<h2>Créer un compte</h2>
+
+
+<input id="email" type="email" placeholder="Votre email">
+
+
+<input id="password" type="password" placeholder="Votre mot de passe">
+
+
+<button onclick="inscription()">
+Créer mon compte
+</button>
+
 
 <p>
-Déjà un compte ?
-<a href="connexion.html">Se connecter</a>
+Vous avez déjà un compte ?
+<a href="connexion.html">
+Se connecter
+</a>
 </p>
+
+
+</div>
+
 
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+
 authDomain: "pbgcboost.firebaseapp.com",
+
 projectId: "pbgcboost",
+
 storageBucket: "pbgcboost.firebasestorage.app",
+
 messagingSenderId: "1086041371195",
+
 appId: "1:1086041371195:web:3ade541590b85a5595221e"
+
 };
 
 
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 
 
 window.inscription = function(){
 
 let email = document.getElementById("email").value;
+
 let password = document.getElementById("password").value;
+
 
 
 createUserWithEmailAndPassword(auth,email,password)
 
 .then(()=>{
+
 alert("Compte créé avec succès !");
+
 window.location.href="connexion.html";
+
 })
 
+
 .catch((error)=>{
+
 alert(error.message);
+
 });
+
 
 }
 
+
 </script>
+
 
 </body>
 </html>
