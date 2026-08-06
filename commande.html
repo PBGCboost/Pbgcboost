@@ -219,7 +219,22 @@ statut:"En attente",
 date:serverTimestamp()
 
 });
-
+// Envoi de la notification à Pipedream
+await fetch("https://eozjnkrglri1u1tg.m.pipedream.net", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    service: service,
+    quantite: quantite,
+    lien: lien,
+    email: user.email,
+    paiement: paiement,
+    transaction: transaction,
+    statut: "En attente"
+  })
+});
 alert("Commande enregistrée avec succès !");
 
 window.location.href="espace-client.html";
