@@ -363,13 +363,10 @@ async function loadOrders() {
 
   try {
 
-    const ordersQuery = query(
-      collection(db, "commandes"),
-      orderBy("date", "desc")
-    );
-
     const snapshot =
-      await getDocs(ordersQuery);
+  await getDocs(
+    collection(db, "commandes")
+  );
 
     allOrders = [];
 
