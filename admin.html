@@ -357,27 +357,24 @@ async function loadOrders() {
     document.getElementById("message");
 
   ordersContainer.innerHTML =
-    '<div class="loading">Chargement des commandes...</div>';
+    '<div class="loading">Connexion à Firebase...</div>';
 
   message.innerHTML = "";
 
   try {
 
     const snapshot =
-  await getDocs(
-    collection(db, "commandes")
-  );
+      await getDocs(
+        collection(db, "commandes")
+      );
 
     allOrders = [];
 
     snapshot.forEach((document) => {
 
       allOrders.push({
-
         id: document.id,
-
         ...document.data()
-
       });
 
     });
@@ -386,25 +383,27 @@ async function loadOrders() {
 
     updateStats(allOrders);
 
-  }
+  } catch (error) {
 
-  catch (error) {
-
-    console.error(error);
+    console.error("ERREUR FIREBASE :", error);
 
     ordersContainer.innerHTML = "";
 
     message.innerHTML = `
       <div class="error">
-        ❌ Impossible de charger les commandes.
+        ❌ ERREUR FIREBASE
         <br><br>
-        ${error.message}
+        <strong>Code :</strong>
+        ${escapeHtml(error.code || "inconnu")}
+        <br><br>
+        <strong>Message :</strong>
+        ${escapeHtml(error.message || "Erreur inconnue")}
       </div>
     `;
 
   }
 
-}
+  }
 
 
 function displayOrders(orders) {
