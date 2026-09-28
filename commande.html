@@ -205,6 +205,53 @@ const montant=document.getElementById("prix").textContent;
 
 try{
 
+try {
+  // 1. Enregistrer la commande dans Firestore
+  await addDoc(collection(db, "commandes"), {
+    uid: user.uid,
+    email: user.email,
+    service: service,
+    quantite: quantite,
+    prix: montant,
+    lien: lien,
+    paiement: paiement,
+    transaction: transaction,
+    statut: "En attente",
+    date: serverTimestamp()
+  });
+
+  // 2. Envoyer la notification à Pipedream
+  try {
+    await fetch("https://eoi71i1ly0qx7m1.m.pipedream.net", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        service: service,
+        quantite: quantite,
+        lien: lien,
+        email: user.email,
+        paiement: paiement,
+        transaction: transaction,
+        statut: "En attente"
+      })
+    });
+  } catch (notificationError) {
+    console.error(
+      "Erreur de notification Telegram :",
+      notificationError
+    );
+  }
+
+  // 3. Confirmer l'enregistrement
+  alert("Commande enregistrée avec succès !");
+  window.location.href = "espace-client.html";
+
+} catch (e) {
+  alert("Erreur lors de l'enregistrement : " + e.message);
+    }
+    
 await addDoc(collection(db,"commandes"),{
 
 uid:user.uid,
