@@ -142,11 +142,19 @@ placeholder="Exemple : PP240815XXXX">
 <button id="envoyer">
 Envoyer la commande
   </button>
-  <script type="module">
-
+ <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
@@ -161,140 +169,220 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+let currentUser = null;
+
+/* Vérifier correctement l'état de connexion Firebase */
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+});
+
+/* TARIFS */
 const prix = {
-  "Facebook J'aime":{"200":300,"500":700,"1000":1300,"2000":2500,"10000":11000},
-  "Facebook Abonnés":{"200":500,"500":1000,"1000":2000,"2000":4000,"10000":20000},
-  "TikTok J'aime":{"200":500,"500":1100,"1000":2000,"2000":4000},
-  "TikTok Abonnés":{"200":600,"500":1300,"1000":2600,"2000":5200},
-  "YouTube":{"200":1000,"500":2500,"1000":5000},
-  "Instagram":{"200":1000,"500":2500,"1000":5000},
-  "Telegram":{"200":1000,"500":2500,"1000":5000}
+  "Facebook J'aime": {
+    "200": 300,
+    "500": 700,
+    "1000": 1300,
+    "2000": 2500,
+    "10000": 11000
+  },
+
+  "Facebook Abonnés": {
+    "200": 500,
+    "500": 1000,
+    "1000": 2000,
+    "2000": 4000,
+    "10000": 20000
+  },
+
+  "TikTok J'aime": {
+    "200": 500,
+    "500": 1100,
+    "1000": 2000,
+    "2000": 4000
+  },
+
+  "TikTok Abonnés": {
+    "200": 600,
+    "500": 1300,
+    "1000": 2600,
+    "2000": 5200
+  },
+
+  "YouTube": {
+    "200": 1000,
+    "500": 2500,
+    "1000": 5000
+  },
+
+  "Instagram": {
+    "200": 1000,
+    "500": 2500,
+    "1000": 5000
+  },
+
+  "Telegram": {
+    "200": 1000,
+    "500": 2500,
+    "1000": 5000
+  }
 };
 
-function calculPrix(){
-  const service = document.getElementById("service").value;
-  const quantite = document.getElementById("quantite").value;
+/* CALCUL DU PRIX */
+function calculPrix() {
+
+  const service =
+    document.getElementById("service").value;
+
+  const quantite =
+    document.getElementById("quantite").value;
 
   let montant = 0;
 
-  if(prix[service] && prix[service][quantite]){
+  if (prix[service] && prix[service][quantite]) {
     montant = prix[service][quantite];
   }
 
   document.getElementById("prix").textContent = montant;
 }
 
-document.getElementById("service").addEventListener("change",calculPrix);
-document.getElementById("quantite").addEventListener("change",calculPrix);
+document
+  .getElementById("service")
+  .addEventListener("change", calculPrix);
 
-document.getElementById("envoyer").addEventListener("click", async()=>{
+document
+  .getElementById("quantite")
+  .addEventListener("change", calculPrix);
 
-const user = auth.currentUser;
 
-if(!user){
-alert("Veuillez vous connecter.");
-return;
-}
+/* ENVOI DE LA COMMANDE */
+document
+  .getElementById("envoyer")
+  .addEventListener("click", async () => {
 
-const service=document.getElementById("service").value;
-const quantite=document.getElementById("quantite").value;
-const lien=document.getElementById("lien").value;
-const paiement=document.getElementById("paiement").value;
-const transaction=document.getElementById("transaction").value;
-const montant=document.getElementById("prix").textContent;
+    /* Attendre que Firebase confirme l'utilisateur */
+    const user = currentUser;
 
-try{
+    if (!user) {
+      alert("Veuillez vous connecter.");
+      return;
+    }
 
-try {
-  // 1. Enregistrer la commande dans Firestore
-  await addDoc(collection(db, "commandes"), {
-    uid: user.uid,
-    email: user.email,
-    service: service,
-    quantite: quantite,
-    prix: montant,
-    lien: lien,
-    paiement: paiement,
-    transaction: transaction,
-    statut: "En attente",
-    date: serverTimestamp()
+    const service =
+      document.getElementById("service").value;
+
+    const quantite =
+      document.getElementById("quantite").value;
+
+    const lien =
+      document.getElementById("lien").value;
+
+    const paiement =
+      document.getElementById("paiement").value;
+
+    const transaction =
+      document.getElementById("transaction").value;
+
+    const montant =
+      document.getElementById("prix").textContent;
+
+
+    /* Vérification des champs */
+    if (!service || !quantite || !lien || !transaction) {
+      alert("Veuillez remplir tous les champs.");
+      return;
+    }
+
+
+    try {
+
+      /* 1. ENREGISTRER UNE SEULE FOIS DANS FIRESTORE */
+      await addDoc(collection(db, "commandes"), {
+
+        uid: user.uid,
+
+        email: user.email,
+
+        service: service,
+
+        quantite: quantite,
+
+        prix: montant,
+
+        lien: lien,
+
+        paiement: paiement,
+
+        transaction: transaction,
+
+        statut: "En attente",
+
+        date: serverTimestamp()
+
+      });
+
+
+      /* 2. ENVOYER UNE SEULE NOTIFICATION À PIPEDREAM */
+      try {
+
+        await fetch(
+          "https://eoi71i1ly0qx7m1.m.pipedream.net",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+              service: service,
+
+              quantite: quantite,
+
+              lien: lien,
+
+              email: user.email,
+
+              paiement: paiement,
+
+              transaction: transaction,
+
+              statut: "En attente"
+
+            })
+          }
+        );
+
+      } catch (notificationError) {
+
+        console.error(
+          "Erreur de notification Telegram :",
+          notificationError
+        );
+
+      }
+
+
+      /* 3. CONFIRMATION */
+      alert("Commande enregistrée avec succès !");
+
+      window.location.href = "espace-client.html";
+
+
+    } catch (e) {
+
+      alert(
+        "Erreur lors de l'enregistrement : " +
+        e.message
+      );
+
+      console.error(e);
+
+    }
+
   });
 
-  // 2. Envoyer la notification à Pipedream
-  try {
-    await fetch("https://eoi71i1ly0qx7m1.m.pipedream.net", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        service: service,
-        quantite: quantite,
-        lien: lien,
-        email: user.email,
-        paiement: paiement,
-        transaction: transaction,
-        statut: "En attente"
-      })
-    });
-  } catch (notificationError) {
-    console.error(
-      "Erreur de notification Telegram :",
-      notificationError
-    );
-  }
-
-  // 3. Confirmer l'enregistrement
-  alert("Commande enregistrée avec succès !");
-  window.location.href = "espace-client.html";
-
-} catch (e) {
-  alert("Erreur lors de l'enregistrement : " + e.message);
-    }
-    
-await addDoc(collection(db,"commandes"),{
-
-uid:user.uid,
-email:user.email,
-service:service,
-quantite:quantite,
-prix:montant,
-lien:lien,
-paiement:paiement,
-transaction:transaction,
-statut:"En attente",
-date:serverTimestamp()
-
-});
-// Envoi de la notification à Pipedream
-await fetch("https://eozjnkrglri1u1tg.m.pipedream.net", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    service: service,
-    quantite: quantite,
-    lien: lien,
-    email: user.email,
-    paiement: paiement,
-    transaction: transaction,
-    statut: "En attente"
-  })
-});
-alert("Commande enregistrée avec succès !");
-
-window.location.href="espace-client.html";
-
-}catch(e){
-
-alert("Erreur : "+e.message);
-
-}
-
-});
-
-</script>
+ </script>
 
 </body>
                           </html>
