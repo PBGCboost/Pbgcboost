@@ -4,14 +4,16 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>Espace client - PBGCboost</title>
 
 <style>
 
 body{
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:#f4f4f4;
 margin:0;
 }
@@ -25,6 +27,8 @@ text-align:center;
 
 .container{
 padding:20px;
+max-width:700px;
+margin:auto;
 }
 
 .card{
@@ -32,7 +36,6 @@ background:white;
 padding:20px;
 margin:15px auto;
 border-radius:12px;
-max-width:600px;
 box-shadow:0 2px 8px #ccc;
 }
 
@@ -41,7 +44,7 @@ display:block;
 background:#1877f2;
 color:white;
 padding:15px;
-margin:10px;
+margin:10px 0;
 border-radius:8px;
 text-decoration:none;
 }
@@ -52,6 +55,51 @@ color:white;
 padding:12px 20px;
 border:none;
 border-radius:8px;
+}
+
+.commande{
+background:#f8f9fa;
+border:1px solid #ddd;
+padding:15px;
+margin:15px 0;
+border-radius:10px;
+}
+
+.statut{
+display:inline-block;
+padding:8px 12px;
+border-radius:20px;
+font-weight:bold;
+margin-top:8px;
+}
+
+.attente{
+background:#fff3cd;
+color:#856404;
+}
+
+.encours{
+background:#cce5ff;
+color:#004085;
+}
+
+.termine{
+background:#d4edda;
+color:#155724;
+}
+
+.annule{
+background:#f8d7da;
+color:#721c24;
+}
+
+.lien{
+word-break:break-all;
+}
+
+#messageCommandes{
+text-align:center;
+color:#666;
 }
 
 </style>
@@ -75,7 +123,6 @@ Déconnexion
 </header>
 
 
-
 <div class="container">
 
 
@@ -84,49 +131,72 @@ Déconnexion
 <h2>Bienvenue dans votre espace client</h2>
 
 <p>
-Choisissez un service pour voir les tarifs.
+Vous pouvez suivre ici l'état de vos commandes.
 </p>
 
 </div>
 
 
+<!-- MES COMMANDES -->
+
+<div class="card">
+
+<h2>📦 Mes commandes</h2>
+
+<div id="messageCommandes">
+Chargement de vos commandes...
+</div>
+
+<div id="listeCommandes"></div>
+
+</div>
+
+
+<!-- SERVICES -->
 
 <div class="card">
 
 <h2>Nos services</h2>
 
 
-<a class="service" href="facebook-jaime.html">
+<a class="service"
+href="facebook-jaime.html">
 📘 Facebook J'aime
 </a>
 
 
-<a class="service" href="facebook-abonnes.html">
+<a class="service"
+href="facebook-abonnes.html">
 👥 Facebook Abonnés
 </a>
 
 
-<a class="service" href="tiktok-jaime.html">
+<a class="service"
+href="tiktok-jaime.html">
 🎵 TikTok J'aime
 </a>
 
 
-<a class="service" href="tiktok-abonnes.html">
+<a class="service"
+href="tiktok-abonnes.html">
 🎵 TikTok Abonnés
 </a>
 
 
-<a class="service" href="youtube.html">
+<a class="service"
+href="youtube.html">
 ▶️ YouTube
 </a>
 
 
-<a class="service" href="instagram.html">
+<a class="service"
+href="instagram.html">
 📸 Instagram
 </a>
 
 
-<a class="service" href="telegram.html">
+<a class="service"
+href="telegram.html">
 ✈️ Telegram
 </a>
 
@@ -140,33 +210,47 @@ Choisissez un service pour voir les tarifs.
 
 <script type="module">
 
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
 import {
-
 getAuth,
-
+onAuthStateChanged,
 signOut
-
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+import {
+getFirestore,
+collection,
+query,
+where,
+onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+apiKey:
+"AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
 
-authDomain: "pbgcboost.firebaseapp.com",
+authDomain:
+"pbgcboost.firebaseapp.com",
 
-projectId: "pbgcboost",
+projectId:
+"pbgcboost",
 
-storageBucket: "pbgcboost.firebasestorage.app",
+storageBucket:
+"pbgcboost.firebasestorage.app",
 
-messagingSenderId: "1086041371195",
+messagingSenderId:
+"1086041371195",
 
-appId: "1:1086041371195:web:3ade541590b85a5595221e"
+appId:
+"1:1086041371195:web:3ade541590b85a5595221e"
 
 };
 
@@ -176,24 +260,200 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
+const db = getFirestore(app);
 
 
-window.deconnexion = function(){
 
-signOut(auth)
+/* =========================
+   AFFICHER LES COMMANDES
+========================= */
 
-.then(()=>{
+function afficherCommandes(user){
 
-window.location.href="connexion.html";
+const liste =
+document.getElementById("listeCommandes");
 
-});
+const message =
+document.getElementById("messageCommandes");
+
+
+const commandesRef =
+collection(db,"commandes");
+
+
+const q =
+query(
+commandesRef,
+where("uid","==",user.uid)
+);
+
+
+onSnapshot(q,(snapshot)=>{
+
+liste.innerHTML = "";
+
+
+if(snapshot.empty){
+
+message.textContent =
+"Vous n'avez encore aucune commande.";
+
+return;
 
 }
 
 
+message.textContent = "";
+
+
+snapshot.forEach((doc)=>{
+
+const commande = doc.data();
+
+
+let statut =
+commande.statut || "En attente";
+
+
+let classeStatut =
+"attente";
+
+
+if(statut === "En cours"){
+
+classeStatut =
+"encours";
+
+}
+
+
+if(statut === "Terminé"){
+
+classeStatut =
+"termine";
+
+}
+
+
+if(statut === "Annulé"){
+
+classeStatut =
+"annule";
+
+}
+
+
+
+const div =
+document.createElement("div");
+
+
+div.className =
+"commande";
+
+
+div.innerHTML = `
+
+<h3>📦 Commande</h3>
+
+<p>
+<strong>Service :</strong>
+${commande.service || "Non renseigné"}
+</p>
+
+<p>
+<strong>Quantité :</strong>
+${commande.quantite || "Non renseignée"}
+</p>
+
+<p>
+<strong>Prix :</strong>
+${commande.prix || "0"} FCFA
+</p>
+
+<p class="lien">
+<strong>Lien :</strong>
+${commande.lien || "Non renseigné"}
+</p>
+
+<p>
+<strong>Paiement :</strong>
+${commande.paiement || "Non renseigné"}
+</p>
+
+<p>
+<strong>Transaction :</strong>
+${commande.transaction || "Non renseignée"}
+</p>
+
+<p>
+<strong>Statut :</strong>
+<br>
+
+<span class="statut ${classeStatut}">
+${statut}
+</span>
+
+</p>
+
+`;
+
+
+liste.appendChild(div);
+
+});
+
+});
+
+
+}
+
+
+
+/* =========================
+   VÉRIFICATION CONNEXION
+========================= */
+
+onAuthStateChanged(auth,(user)=>{
+
+if(!user){
+
+alert("Veuillez vous connecter.");
+
+window.location.href =
+"connexion.html";
+
+return;
+
+}
+
+
+afficherCommandes(user);
+
+});
+
+
+
+/* =========================
+   DÉCONNEXION
+========================= */
+
+window.deconnexion =
+function(){
+
+signOut(auth)
+.then(()=>{
+
+window.location.href =
+"connexion.html";
+
+});
+
+};
+
 </script>
 
 
-
 </body>
-</html>
+
+  </html>
