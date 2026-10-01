@@ -1,53 +1,318 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
 <meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>Connexion - PBGCboost</title>
 
 <style>
+
 body{
-font-family:Arial;
+font-family:Arial,sans-serif;
 text-align:center;
 background:#f5f5f5;
 padding:30px;
 }
 
-input, button{
+.container{
+max-width:450px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 2px 10px #ccc;
+}
+
+input{
 width:90%;
 padding:12px;
-margin:8px;
+margin:8px 0;
+border:1px solid #ccc;
 border-radius:8px;
+box-sizing:border-box;
 }
 
 button{
+width:90%;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
 background:#1877f2;
 color:white;
 border:none;
+font-size:16px;
+cursor:pointer;
 }
+
+button:disabled{
+background:#999;
+}
+
+#message{
+margin-top:15px;
+font-weight:bold;
+}
+
+.erreur{
+color:#d9534f;
+}
+
+.succes{
+color:#198754;
+}
+
+a{
+color:#1877f2;
+}
+
 </style>
 
 </head>
 
+
 <body>
+
+
+<div class="container">
 
 <h1>Connexion PBGCboost</h1>
 
-<form>
+<p>Connectez-vous à votre compte</p>
 
-<input type="email" placeholder="Votre Email" required>
 
-<input type="password" placeholder="Votre Mot de passe" required>
+<form id="formConnexion">
 
-<button type="button" onclick="window.location.href='espace-client.html'">
+
+<input
+type="email"
+id="email"
+placeholder="Votre Email"
+required
+>
+
+
+<input
+type="password"
+id="password"
+placeholder="Votre Mot de passe"
+required
+>
+
+
+<button
+type="submit"
+id="btnConnexion"
+>
 Se connecter
 </button>
 
+
 </form>
+
+
+<div id="message"></div>
+
 
 <p>
 Vous n'avez pas encore de compte ?
-<a href="inscription.html">Créer un compte</a>
+<a href="inscription.html">
+Créer un compte
+</a>
 </p>
 
+
+</div>
+
+
+
+<script type="module">
+
+
+import {
+initializeApp
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+import {
+getAuth,
+signInWithEmailAndPassword
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+
+authDomain:
+"pbgcboost.firebaseapp.com",
+
+projectId:
+"pbgcboost",
+
+storageBucket:
+"pbgcboost.firebasestorage.app",
+
+messagingSenderId:
+"1086041371195",
+
+appId:
+"1:1086041371195:web:3ade541590b85a5595221e"
+
+};
+
+
+
+const app =
+initializeApp(firebaseConfig);
+
+
+const auth =
+getAuth(app);
+
+
+
+const form =
+document.getElementById("formConnexion");
+
+
+const emailInput =
+document.getElementById("email");
+
+
+const passwordInput =
+document.getElementById("password");
+
+
+const message =
+document.getElementById("message");
+
+
+const bouton =
+document.getElementById("btnConnexion");
+
+
+
+form.addEventListener("submit", async (e)=>{
+
+e.preventDefault();
+
+
+const email =
+emailInput.value.trim();
+
+
+const password =
+passwordInput.value;
+
+
+message.textContent =
+"Connexion en cours...";
+
+message.className =
+"succes";
+
+
+bouton.disabled =
+true;
+
+
+try{
+
+
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+
+message.textContent =
+"Connexion réussie. Redirection...";
+
+
+setTimeout(()=>{
+
+window.location.href =
+"espace-client.html";
+
+},500);
+
+
+}catch(error){
+
+
+bouton.disabled =
+false;
+
+
+message.className =
+"erreur";
+
+
+if(
+error.code ===
+"auth/invalid-credential"
+){
+
+message.textContent =
+"Email ou mot de passe incorrect.";
+
+}
+
+else if(
+error.code ===
+"auth/user-not-found"
+){
+
+message.textContent =
+"Ce compte n'existe pas.";
+
+}
+
+else if(
+error.code ===
+"auth/wrong-password"
+){
+
+message.textContent =
+"Mot de passe incorrect.";
+
+}
+
+else if(
+error.code ===
+"auth/invalid-email"
+){
+
+message.textContent =
+"Adresse email invalide.";
+
+}
+
+else{
+
+message.textContent =
+"Erreur de connexion. Veuillez réessayer.";
+
+}
+
+}
+
+});
+
+
+</script>
+
+
 </body>
+
 </html>
