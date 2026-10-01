@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dépôts - Admin PBGCboost</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #222;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      margin-bottom: 18px;
+      padding: 18px;
+      border-radius: 15px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    }
+
+    .ligne {
+      margin: 8px 0;
+      word-break: break-word;
+    }
+
+    .montant {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .statut {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .attente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .valide {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .refuse {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    button {
+      border: none;
+      padding: 12px 15px;
+      border-radius: 9px;
+      color: white;
+      font-weight: bold;
+      margin-top: 12px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+
+    .btn-valider {
+      background: #16a34a;
+    }
+
+    .btn-refuser {
+      background: #dc2626;
+    }
+
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .vide {
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>👑 PBGCboost</h1>
+  <p>Gestion des dépôts</p>
+</header>
+
+<div class="container">
+
+  <p>
+    <a href="admin.html">← Retour à l'administration</a>
+  </p>
+
+  <div id="message" class="message"></div>
+
+  <div id="depots">
+    <div class="vide">
+      Chargement des dépôts...
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  import {
+    getFirestore,
+    collection,
+    onSnapshot,
+    doc,
+    runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+    authDomain: "pbgcboost.firebaseapp.com",
+    projectId: "pbgcboost",
+    storageBucket: "pbgcboost.firebasestorage.app",
+    messagingSenderId: "1086041371195",
+    appId: "1:1086041371195:web:3ade541590b85a5595221e"
+  };
+
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+
+  const ADMIN_UID =
+    "XZT7MEF2I1fCWBc5reTUU9Cegnk1";
+
+
+  const depotsDiv =
+    document.getElementById("depots");
+
+  const messageDiv =
+    document.getElementById("message");
+
+
+  function afficherErreur(texte) {
+
+    messageDiv.textContent = texte;
+    messageDiv.className = "message error";
+    messageDiv.style.display = "block";
+
+  }
+
+
+  function cacherMessage() {
+
+    messageDiv.style.display = "none";
+
+  }
+
+
+  function formatDate(timestamp) {
+
+    if (!timestamp) {
+      return "Date inconnue";
+    }
+
+    try {
+
+      return timestamp
+        .toDate()
+        .toLocaleString("fr-FR");
+
+    } catch {
+
+      return "Date inconnue";
+
+    }
+
+  }
+
+
+  function afficherDepots(snapshot) {
+
+    depotsDiv.innerHTML = "";
+
+    if (snapshot.empty) {
+
+      depotsDiv.innerHTML = `
+        <div class="vide">
+          💰 Aucun dépôt pour le moment.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const depots = [];
+
+    snapshot.forEach((documentSnapshot) => {
+
+      depots.push({
+        id: documentSnapshot.id,
+        ...documentSnapshot.data()
+      });
+
+    });
+
+
+    depots.sort((a, b) => {
+
+      const dateA =
+        a.date?.toMillis?.() || 0;
+
+      const dateB =
+        b.date?.toMillis?.() || 0;
+
+      return dateB - dateA;
+
+    });
+
+
+    depots.forEach((depot) => {
+
+      const card =
+        document.createElement("div");
+
+      card.className = "card";
+
+
+      const statut =
+        depot.statut || "En attente";
+
+
+      let statutClass = "attente";
+
+      if (statut === "Validé") {
+        statutClass = "valide";
+      }
+
+      if (statut === "Refusé") {
+        statutClass = "refuse";
+      }
+
+
+      card.innerHTML = `
+
+        <div class="ligne montant">
+          💰 ${Number(depot.montant || 0).toLocaleString("fr-FR")} FCFA
+        </div>
+
+        <div class="ligne">
+          👤 <strong>Email :</strong>
+          ${depot.email || "Non renseigné"}
+        </div>
+
+        <div class="ligne">
+          📱 <strong>Paiement :</strong>
+          ${depot.paiement || "Non renseigné"}
+        </div>
+
+        <div class="ligne">
+          🔢 <strong>Transaction :</strong>
+          ${depot.transaction || "Non renseignée"}
+        </div>
+
+        <div class="ligne">
+          🕐 <strong>Date :</strong>
+          ${formatDate(depot.date)}
+        </div>
+
+        <div class="ligne">
+          📌 <strong>Statut :</strong><br>
+
+          <span class="statut ${statutClass}">
+            ${statut}
+          </span>
+        </div>
+
+      `;
+
+
+      if (statut === "En attente") {
+
+        const btnValider =
+          document.createElement("button");
+
+        btnValider.className =
+          "btn-valider";
+
+        btnValider.textContent =
+          "✅ Valider et créditer";
+
+
+        const btnRefuser =
+          document.createElement("button");
+
+        btnRefuser.className =
+          "btn-refuser";
+
+        btnRefuser.textContent =
+          "❌ Refuser";
+
+
+        btnValider.addEventListener(
+          "click",
+          () => validerDepot(
+            depot.id,
+            depot.uid,
+            depot.montant,
+            btnValider,
+            btnRefuser
+          )
+        );
+
+
+        btnRefuser.addEventListener(
+          "click",
+          () => refuserDepot(
+            depot.id,
+            btnValider,
+            btnRefuser
+          )
+        );
+
+
+        card.appendChild(btnValider);
+        card.appendChild(btnRefuser);
+
+      }
+
+
+      depotsDiv.appendChild(card);
+
+    });
+
+  }
+
+
+  async function validerDepot(
+    depotId,
+    uid,
+    montant,
+    btnValider,
+    btnRefuser
+  ) {
+
+    if (!uid) {
+
+      alert(
+        "❌ Ce dépôt ne contient pas d'identifiant client."
+      );
+
+      return;
+
+    }
+
+
+    const confirmation = confirm(
+      "Confirmer la validation de ce dépôt de " +
+      Number(montant).toLocaleString("fr-FR") +
+      " FCFA ?"
+    );
+
+
+    if (!confirmation) {
+      return;
+    }
+
+
+    btnValider.disabled = true;
+    btnRefuser.disabled = true;
+
+    btnValider.textContent =
+      "Validation...";
+
+
+    try {
+
+      await runTransaction(
+        db,
+        async (transaction) => {
+
+          const depotRef =
+            doc(db, "depots", depotId);
+
+          const userRef =
+            doc(db, "users", uid);
+
+
+          const depotSnap =
+            await transaction.get(depotRef);
+
+
+          if (!depotSnap.exists()) {
+
+            throw new Error(
+              "Dépôt introuvable."
+            );
+
+          }
+
+
+          const depotData =
+            depotSnap.data();
+
+
+          if (depotData.statut !== "En attente") {
+
+            throw new Error(
+              "Ce dépôt a déjà été traité."
+            );
+
+          }
+
+
+          const montantDepot =
+            Number(depotData.montant);
+
+
+          if (!montantDepot || montantDepot <= 0) {
+
+            throw new Error(
+              "Montant du dépôt invalide."
+            );
+
+          }
+
+
+          const userSnap =
+            await transaction.get(userRef);
+
+
+          let ancienSolde = 0;
+
+
+          if (userSnap.exists()) {
+
+            ancienSolde =
+              Number(
+                userSnap.data().solde || 0
+              );
+
+          }
+
+
+          const nouveauSolde =
+            ancienSolde + montantDepot;
+
+
+          if (userSnap.exists()) {
+
+            transaction.update(
+              userRef,
+              {
+                solde: nouveauSolde
+              }
+            );
+
+          } else {
+
+            transaction.set(
+              userRef,
+              {
+                email:
+                  depotData.email || "",
+                solde:
+                  nouveauSolde
+              }
+            );
+
+          }
+
+
+          transaction.update(
+            depotRef,
+            {
+              statut: "Validé",
+              dateValidation:
+                new Date()
+            }
+          );
+
+        }
+      );
+
+
+      alert(
+        "✅ Dépôt validé et solde crédité."
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "❌ " + (
+          error.message ||
+          "Erreur lors de la validation."
+        )
+      );
+
+
+      btnValider.disabled = false;
+      btnRefuser.disabled = false;
+
+      btnValider.textContent =
+        "✅ Valider et créditer";
+
+    }
+
+  }
+
+
+  async function refuserDepot(
+    depotId,
+    btnValider,
+    btnRefuser
+  ) {
+
+    const confirmation = confirm(
+      "Voulez-vous vraiment refuser ce dépôt ?"
+    );
+
+
+    if (!confirmation) {
+      return;
+    }
+
+
+    btnValider.disabled = true;
+    btnRefuser.disabled = true;
+
+    btnRefuser.textContent =
+      "Refus...";
+
+
+    try {
+
+      await runTransaction(
+        db,
+        async (transaction) => {
+
+          const depotRef =
+            doc(db, "depots", depotId);
+
+
+          const depotSnap =
+            await transaction.get(depotRef);
+
+
+          if (!depotSnap.exists()) {
+
+            throw new Error(
+              "Dépôt introuvable."
+            );
+
+          }
+
+
+          const depotData =
+            depotSnap.data();
+
+
+          if (depotData.statut !== "En attente") {
+
+            throw new Error(
+              "Ce dépôt a déjà été traité."
+            );
+
+          }
+
+
+          transaction.update(
+            depotRef,
+            {
+              statut: "Refusé",
+              dateValidation:
+                new Date()
+            }
+          );
+
+        }
+      );
+
+
+      alert(
+        "❌ Dépôt refusé."
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "❌ " + (
+          error.message ||
+          "Erreur lors du refus."
+        )
+      );
+
+
+      btnValider.disabled = false;
+      btnRefuser.disabled = false;
+
+      btnRefuser.textContent =
+        "❌ Refuser";
+
+    }
+
+  }
+
+
+  onAuthStateChanged(
+    auth,
+    (user) => {
+
+      if (!user) {
+
+        afficherErreur(
+          "❌ Vous devez être connecté en tant qu'administrateur."
+        );
+
+        return;
+
+      }
+
+
+      if (user.uid !== ADMIN_UID) {
+
+        afficherErreur(
+          "❌ Accès refusé : compte administrateur requis."
+        );
+
+        return;
+
+      }
+
+
+      cacherMessage();
+
+
+      onSnapshot(
+        collection(db, "depots"),
+        (snapshot) => {
+
+          afficherDepots(snapshot);
+
+        },
+        (error) => {
+
+          console.error(error);
+
+          afficherErreur(
+            "❌ Impossible de charger les dépôts."
+          );
+
+        }
+      );
+
+    }
+  );
+
+</script>
+
+</body>
+  </html>
