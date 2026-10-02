@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Administration - PBGCboost</title>
 
   <style>
@@ -13,65 +12,100 @@
 
     body {
       margin: 0;
-      padding: 20px;
       font-family: Arial, sans-serif;
       background: #f4f6f8;
       color: #222;
     }
 
     header {
-      background: #1877f2;
+      background: #111827;
       color: white;
-      padding: 20px;
+      padding: 18px;
       text-align: center;
-      border-radius: 12px;
-      margin-bottom: 20px;
     }
 
     header h1 {
-      margin: 0 0 8px;
+      margin: 0;
+      font-size: 22px;
     }
 
     header p {
-      margin: 0;
+      margin: 6px 0 0;
+      font-size: 14px;
+      opacity: 0.85;
     }
 
-    .top-bar {
+    .container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .message {
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+      font-weight: bold;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .loading {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .top-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-bottom: 20px;
     }
 
-    #search {
-      flex: 1;
-      min-width: 220px;
-      padding: 13px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    button {
+    button,
+    .btn {
       border: none;
-      border-radius: 8px;
-      padding: 12px 16px;
+      border-radius: 7px;
+      padding: 11px 15px;
       cursor: pointer;
+      text-decoration: none;
       font-weight: bold;
+      display: inline-block;
     }
 
-    .refresh-btn {
-      background: #1877f2;
+    .btn-refresh {
+      background: #2563eb;
       color: white;
     }
 
-    .refresh-btn:hover {
-      background: #0d65d9;
+    .btn-logout {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-link {
+      background: #374151;
+      color: white;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -80,17 +114,35 @@
       background: white;
       padding: 18px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
-    }
-
-    .stat h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-      color: #666;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
     }
 
     .stat strong {
-      font-size: 24px;
+      display: block;
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    .stat span {
+      color: #666;
+      font-size: 13px;
+    }
+
+    .search-box {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 7px;
+      font-size: 15px;
     }
 
     .orders {
@@ -100,104 +152,80 @@
 
     .order {
       background: white;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
+    .order h3 {
+      margin: 0 0 12px;
+      color: #111827;
     }
 
-    .order-id {
-      font-weight: bold;
-      color: #1877f2;
-    }
-
-    .order-info {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .info {
-      background: #f7f8fa;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    .info strong {
-      display: block;
-      margin-bottom: 4px;
-      color: #555;
-      font-size: 13px;
-    }
-
-    .info span {
+    .order p {
+      margin: 7px 0;
       word-break: break-word;
     }
 
-    .link {
-      color: #1877f2;
-      text-decoration: none;
-      word-break: break-all;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .whatsapp {
-      background: #25d366;
-      color: white;
-    }
-
-    .open-link {
-      background: #6c757d;
-      color: white;
-    }
-
-    .status-select {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: white;
+    .order-label {
       font-weight: bold;
     }
 
     .status {
       display: inline-block;
-      padding: 7px 10px;
+      padding: 5px 9px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
     }
 
     .status-en-attente {
-      background: #fff3cd;
-      color: #856404;
+      background: #fef3c7;
+      color: #92400e;
     }
 
     .status-en-cours {
-      background: #cfe2ff;
-      color: #084298;
+      background: #dbeafe;
+      color: #1e40af;
     }
 
     .status-termine {
-      background: #d1e7dd;
-      color: #0f5132;
+      background: #dcfce7;
+      color: #166534;
     }
 
     .status-annule {
-      background: #f8d7da;
-      color: #842029;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .actions select {
+      padding: 9px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: white;
+    }
+
+    .btn-status {
+      background: #16a34a;
+      color: white;
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: white;
+    }
+
+    .btn-open {
+      background: #6366f1;
+      color: white;
     }
 
     .empty {
@@ -205,57 +233,22 @@
       padding: 30px;
       text-align: center;
       border-radius: 10px;
-      color: #777;
+      color: #666;
     }
 
-    .loading {
-      text-align: center;
-      padding: 30px;
+    @media (max-width: 700px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
-    .error {
-      background: #f8d7da;
-      color: #842029;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .success {
-      background: #d1e7dd;
-      color: #0f5132;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .login-box {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
+    @media (max-width: 430px) {
+      .stats {
+        grid-template-columns: 1fr 1fr;
       }
 
-      header {
-        padding: 15px;
-      }
-
-      .order {
-        padding: 14px;
-      }
-
-      .top-bar {
-        flex-direction: column;
-      }
-
-      #search {
-        width: 100%;
+      .stat strong {
+        font-size: 21px;
       }
     }
   </style>
@@ -264,283 +257,342 @@
 <body>
 
 <header>
-  <h1>📦 PBGCboost</h1>
-  <p>Administration des commandes</p>
+  <h1>PBGCboost — Administration</h1>
+  <p>Gestion des commandes</p>
 </header>
 
-<div class="top-bar">
+<div class="container">
 
-  <input
-    type="text"
-    id="search"
-    placeholder="🔎 Rechercher une commande..."
-  >
+  <div id="errorMessage" class="message error"></div>
+  <div id="successMessage" class="message success"></div>
 
-  <button
-    id="refreshBtn"
-    class="refresh-btn"
-  >
-    🔄 Actualiser
-  </button>
-
-</div>
-
-<div class="stats">
-
-  <div class="stat">
-    <h3>📦 Commandes</h3>
-    <strong id="totalOrders">0</strong>
+  <div id="loading" class="loading">
+    🔐 Vérification de l’administrateur...
   </div>
 
-  <div class="stat">
-    <h3>💰 Total</h3>
-    <strong id="totalAmount">0 FCFA</strong>
+  <div id="adminContent" style="display:none;">
+
+    <div class="top-actions">
+      <button class="btn btn-refresh" onclick="loadOrders()">
+        🔄 Actualiser
+      </button>
+
+      <a class="btn btn-link" href="admin-depots.html">
+        💰 Gérer les dépôts
+      </a>
+
+      <a class="btn btn-link" href="espace-client.html">
+        👤 Espace client
+      </a>
+
+      <button class="btn btn-logout" onclick="logoutAdmin()">
+        🚪 Déconnexion
+      </button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <strong id="totalOrders">0</strong>
+        <span>Total commandes</span>
+      </div>
+
+      <div class="stat">
+        <strong id="pendingOrders">0</strong>
+        <span>En attente</span>
+      </div>
+
+      <div class="stat">
+        <strong id="processingOrders">0</strong>
+        <span>En cours</span>
+      </div>
+
+      <div class="stat">
+        <strong id="finishedOrders">0</strong>
+        <span>Terminées</span>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="🔎 Rechercher une commande, un email, un service..."
+        oninput="displayOrders()"
+      >
+    </div>
+
+    <div id="orders" class="orders"></div>
+
   </div>
-
-  <div class="stat">
-    <h3>⏳ En attente</h3>
-    <strong id="pendingOrders">0</strong>
-  </div>
-
-  <div class="stat">
-    <h3>🔄 En cours</h3>
-    <strong id="progressOrders">0</strong>
-  </div>
-
-  <div class="stat">
-    <h3>✅ Terminé</h3>
-    <strong id="completedOrders">0</strong>
-  </div>
-
-  <div class="stat">
-    <h3>❌ Annulé</h3>
-    <strong id="cancelledOrders">0</strong>
-  </div>
-
-</div>
-
-<div id="message"></div>
-
-<div id="orders" class="orders">
-
-  <div class="loading">
-    Vérification de l'administrateur...
-  </div>
-
 </div>
 
 
 <script type="module">
 
-  import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
   import {
     getAuth,
-    onAuthStateChanged
-  }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    onAuthStateChanged,
+    signOut
+  } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   import {
     getFirestore,
     collection,
     getDocs,
-    doc,
-    updateDoc
-  }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    updateDoc,
+    doc
+  } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-  /* =========================
-     FIREBASE
-  ========================= */
+  /* =========================================================
+     CONFIGURATION FIREBASE
+     IMPORTANT :
+     Cette configuration est exactement celle des autres pages.
+     ========================================================= */
 
   const firebaseConfig = {
-
-    apiKey: "AIzaSyBhRZ1j_CpbsQoMromaM2FlomLGD5sBwEQ",
-
+    apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
     authDomain: "pbgcboost.firebaseapp.com",
-
     projectId: "pbgcboost",
-
     storageBucket: "pbgcboost.firebasestorage.app",
-
     messagingSenderId: "1086041371195",
-
     appId: "1:1086041371195:web:3ade541590b85a5595221e"
-
   };
 
 
   const app = initializeApp(firebaseConfig);
-
   const auth = getAuth(app);
-
   const db = getFirestore(app);
 
 
-  /* =========================
+  /* =========================================================
      UID ADMINISTRATEUR
-  ========================= */
+     ========================================================= */
 
-  const ADMIN_UID =
-    "XZT7MEF2I1fCWBc5reTUU9Cegnk1";
+  const ADMIN_UID = "XZT7MEF2I1fCWBc5reTUU9Cegnk1";
 
 
   let allOrders = [];
 
 
-  /* =========================
-     AUTHENTIFICATION
-  ========================= */
+  /* =========================================================
+     OUTILS MESSAGES
+     ========================================================= */
+
+  function showError(message) {
+    const box = document.getElementById("errorMessage");
+    box.textContent = "❌ " + message;
+    box.style.display = "block";
+
+    document.getElementById("successMessage").style.display = "none";
+  }
+
+
+  function showSuccess(message) {
+    const box = document.getElementById("successMessage");
+    box.textContent = "✅ " + message;
+    box.style.display = "block";
+
+    document.getElementById("errorMessage").style.display = "none";
+
+    setTimeout(() => {
+      box.style.display = "none";
+    }, 4000);
+  }
+
+
+  /* =========================================================
+     VERIFICATION ADMIN
+     ========================================================= */
 
   onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
 
-      document.getElementById("orders").innerHTML = `
-        <div class="login-box">
-          <h3>🔐 Connexion nécessaire</h3>
-          <p>Vous devez être connecté pour accéder à l'administration.</p>
-          <button
-            class="refresh-btn"
-            onclick="window.location.href='connexion.html'"
-          >
-            Se connecter
-          </button>
-        </div>
-      `;
+      document.getElementById("loading").innerHTML =
+        "⚠️ Vous devez être connecté pour accéder à l'administration.";
+
+      setTimeout(() => {
+        window.location.href = "connexion.html";
+      }, 2000);
 
       return;
     }
+
+
+    console.log("Utilisateur connecté :", user.uid);
 
 
     if (user.uid !== ADMIN_UID) {
 
-      document.getElementById("orders").innerHTML = `
-        <div class="error">
-          ❌ Accès administrateur refusé.
-          <br><br>
-          Le compte connecté n'est pas le compte administrateur.
-        </div>
-      `;
+      document.getElementById("loading").innerHTML =
+        "⛔ Accès refusé : ce compte n'est pas administrateur.";
+
+      showError(
+        "Ce compte n'a pas les droits administrateur."
+      );
 
       return;
     }
 
 
-    document.getElementById("message").innerHTML = `
-      <div class="success">
-        ✅ Administrateur reconnu.
-      </div>
-    `;
+    /* ADMIN CORRECT */
 
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("adminContent").style.display = "block";
 
     await loadOrders();
 
   });
 
 
-  /* =========================
+  /* =========================================================
      CHARGER LES COMMANDES
-  ========================= */
+     ========================================================= */
 
-  async function loadOrders() {
-
-    const ordersContainer =
-      document.getElementById("orders");
-
-    const message =
-      document.getElementById("message");
-
-
-    ordersContainer.innerHTML =
-      '<div class="loading">📦 Chargement des commandes...</div>';
-
+  window.loadOrders = async function () {
 
     try {
 
-      const snapshot =
-        await getDocs(
-          collection(db, "commandes")
-        );
+      document.getElementById("orders").innerHTML =
+        '<div class="loading">⏳ Chargement des commandes...</div>';
+
+
+      const snapshot = await getDocs(
+        collection(db, "commandes")
+      );
 
 
       allOrders = [];
 
 
-      snapshot.forEach((document) => {
+      snapshot.forEach((documentSnapshot) => {
 
         allOrders.push({
-
-          id: document.id,
-
-          ...document.data()
-
+          id: documentSnapshot.id,
+          ...documentSnapshot.data()
         });
 
       });
 
 
-      displayOrders(allOrders);
+      /* Trier : plus récentes d'abord */
 
-      updateStats(allOrders);
+      allOrders.sort((a, b) => {
+
+        const dateA = a.date?.seconds || 0;
+        const dateB = b.date?.seconds || 0;
+
+        return dateB - dateA;
+
+      });
+
+
+      updateStats();
+      displayOrders();
 
 
     } catch (error) {
 
-      console.error(
-        "ERREUR FIREBASE :",
-        error
+      console.error("Erreur Firebase :", error);
+
+      showError(
+        "Impossible de charger les commandes : " +
+        error.message
       );
 
-
-      ordersContainer.innerHTML = "";
-
-
-      message.innerHTML = `
-        <div class="error">
-
-          ❌ ERREUR FIREBASE
-
-          <br><br>
-
-          <strong>Code :</strong>
-          ${escapeHtml(error.code || "inconnu")}
-
-          <br><br>
-
-          <strong>Message :</strong>
-          ${escapeHtml(error.message || "Erreur inconnue")}
-
-        </div>
-      `;
-
+      document.getElementById("orders").innerHTML =
+        '<div class="empty">❌ Impossible de charger les commandes.</div>';
     }
 
+  };
+
+
+  /* =========================================================
+     STATISTIQUES
+     ========================================================= */
+
+  function updateStats() {
+
+    const total = allOrders.length;
+
+    const pending = allOrders.filter(
+      order => order.statut === "En attente"
+    ).length;
+
+    const processing = allOrders.filter(
+      order => order.statut === "En cours"
+    ).length;
+
+    const finished = allOrders.filter(
+      order => order.statut === "Terminé"
+    ).length;
+
+
+    document.getElementById("totalOrders").textContent =
+      total;
+
+    document.getElementById("pendingOrders").textContent =
+      pending;
+
+    document.getElementById("processingOrders").textContent =
+      processing;
+
+    document.getElementById("finishedOrders").textContent =
+      finished;
   }
 
 
-  /* =========================
-     AFFICHER COMMANDES
-  ========================= */
+  /* =========================================================
+     AFFICHER LES COMMANDES
+     ========================================================= */
 
-  function displayOrders(orders) {
+  window.displayOrders = function () {
 
-    const container =
-      document.getElementById("orders");
+    const container = document.getElementById("orders");
+
+    const search =
+      document.getElementById("searchInput")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+    let orders = allOrders;
+
+
+    if (search) {
+
+      orders = allOrders.filter(order => {
+
+        const text = `
+          ${order.service || ""}
+          ${order.email || ""}
+          ${order.lien || ""}
+          ${order.paiement || ""}
+          ${order.transaction || ""}
+          ${order.statut || ""}
+          ${order.uid || ""}
+        `.toLowerCase();
+
+        return text.includes(search);
+
+      });
+
+    }
 
 
     if (orders.length === 0) {
 
-      container.innerHTML = `
-        <div class="empty">
-          📭 Aucune commande trouvée.
-        </div>
-      `;
+      container.innerHTML =
+        '<div class="empty">📭 Aucune commande trouvée.</div>';
 
       return;
-
     }
 
 
@@ -549,824 +601,315 @@
 
     orders.forEach(order => {
 
-      const card =
-        createOrderCard(order);
+      const card = document.createElement("div");
+      card.className = "order";
+
+
+      const statut =
+        order.statut || "En attente";
+
+
+      let statusClass = "status-en-attente";
+
+
+      if (statut === "En cours") {
+        statusClass = "status-en-cours";
+      }
+
+      if (statut === "Terminé") {
+        statusClass = "status-termine";
+      }
+
+      if (statut === "Annulé") {
+        statusClass = "status-annule";
+      }
+
+
+      const dateText = formatDate(order.date);
+
+
+      card.innerHTML = `
+
+        <h3>
+          📦 Commande
+        </h3>
+
+        <p>
+          <span class="order-label">Service :</span>
+          ${escapeHtml(order.service || "Non renseigné")}
+        </p>
+
+        <p>
+          <span class="order-label">Quantité :</span>
+          ${escapeHtml(String(order.quantite || "Non renseignée"))}
+        </p>
+
+        <p>
+          <span class="order-label">Prix :</span>
+          ${escapeHtml(String(order.prix || 0))} FCFA
+        </p>
+
+        <p>
+          <span class="order-label">Lien :</span>
+          ${escapeHtml(order.lien || "Non renseigné")}
+        </p>
+
+        <p>
+          <span class="order-label">Email :</span>
+          ${escapeHtml(order.email || "Non renseigné")}
+        </p>
+
+        <p>
+          <span class="order-label">Paiement :</span>
+          ${escapeHtml(order.paiement || "Non renseigné")}
+        </p>
+
+        <p>
+          <span class="order-label">Transaction :</span>
+          ${escapeHtml(order.transaction || "Non renseignée")}
+        </p>
+
+        <p>
+          <span class="order-label">Date :</span>
+          ${dateText}
+        </p>
+
+        <p>
+          <span class="order-label">Statut :</span>
+          <span class="status ${statusClass}">
+            ${escapeHtml(statut)}
+          </span>
+        </p>
+
+        <div class="actions">
+
+          <select id="status-${order.id}">
+            <option value="En attente"
+              ${statut === "En attente" ? "selected" : ""}>
+              En attente
+            </option>
+
+            <option value="En cours"
+              ${statut === "En cours" ? "selected" : ""}>
+              En cours
+            </option>
+
+            <option value="Terminé"
+              ${statut === "Terminé" ? "selected" : ""}>
+              Terminé
+            </option>
+
+            <option value="Annulé"
+              ${statut === "Annulé" ? "selected" : ""}>
+              Annulé
+            </option>
+          </select>
+
+          <button
+            class="btn btn-status"
+            onclick="changeStatus('${order.id}')">
+            💾 Modifier
+          </button>
+
+          ${
+            order.email
+              ? `
+                <a
+                  class="btn btn-whatsapp"
+                  href="https://wa.me/?text=${encodeURIComponent(
+                    "Bonjour, concernant votre commande PBGCboost : " +
+                    (order.service || "") +
+                    " - quantité " +
+                    (order.quantite || "")
+                  )}"
+                  target="_blank">
+                  WhatsApp
+                </a>
+              `
+              : ""
+          }
+
+          ${
+            order.lien
+              ? `
+                <a
+                  class="btn btn-open"
+                  href="${safeUrl(order.lien)}"
+                  target="_blank"
+                  rel="noopener">
+                  🔗 Ouvrir le lien
+                </a>
+              `
+              : ""
+          }
+
+        </div>
+      `;
 
 
       container.appendChild(card);
 
     });
 
-  }
+  };
 
 
-  /* =========================
-     CARTE COMMANDE
-  ========================= */
+  /* =========================================================
+     MODIFIER LE STATUT
+     ========================================================= */
 
-  function createOrderCard(order) {
-
-    const card =
-      document.createElement("div");
-
-
-    card.className = "order";
-
-
-    const quantity =
-      order.quantite ??
-      order.quantity ??
-      "-";
-
-
-    const link =
-      order.lien ??
-      order.link ??
-      "";
-
-
-    const whatsapp =
-      order.whatsapp ??
-      order.telephone ??
-      order.phone ??
-      order.numero ??
-      "";
-
-
-    const email =
-      order.email ??
-      "";
-
-
-    const service =
-      order.service ??
-      "-";
-
-
-    const prix =
-      Number(
-        order.prix ??
-        order.price ??
-        0
-      );
-
-
-    const paiement =
-      order.paiement ??
-      order.payment ??
-      "-";
-
-
-    const transaction =
-      order.transaction ??
-      "-";
-
-
-    const status =
-      order.statut ??
-      order.status ??
-      "En attente";
-
-
-    const date =
-      formatDate(order.date);
-
-
-    card.innerHTML = `
-
-      <div class="order-header">
-
-        <div>
-
-          <div class="order-id">
-
-            📦 Commande #${escapeHtml(order.id)}
-
-          </div>
-
-          <small>
-            ${escapeHtml(date)}
-          </small>
-
-        </div>
-
-
-        <div>
-
-          <span
-            class="status ${getStatusClass(status)}"
-          >
-            ${escapeHtml(status)}
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <div class="order-info">
-
-
-        <div class="info">
-
-          <strong>👤 Email</strong>
-
-          <span>
-            ${escapeHtml(email || "-")}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>🛠️ Service</strong>
-
-          <span>
-            ${escapeHtml(service)}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>🔢 Quantité</strong>
-
-          <span>
-            ${escapeHtml(quantity)}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>💰 Prix</strong>
-
-          <span>
-            ${formatMoney(prix)}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>💳 Paiement</strong>
-
-          <span>
-            ${escapeHtml(paiement)}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>🧾 Transaction</strong>
-
-          <span>
-            ${escapeHtml(transaction)}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>📱 WhatsApp</strong>
-
-          <span>
-            ${escapeHtml(whatsapp || "-")}
-          </span>
-
-        </div>
-
-
-        <div class="info">
-
-          <strong>🔗 Lien à booster</strong>
-
-          <span>
-
-            ${
-              link
-              ?
-
-              `<a
-                class="link"
-                href="${safeUrl(link)}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Ouvrir le lien
-              </a>`
-
-              :
-
-              "-"
-            }
-
-          </span>
-
-        </div>
-
-
-      </div>
-
-
-      <div class="actions">
-
-
-        <select class="status-select">
-
-          <option
-            value="En attente"
-            ${status === "En attente" ? "selected" : ""}
-          >
-            ⏳ En attente
-          </option>
-
-
-          <option
-            value="En cours"
-            ${status === "En cours" ? "selected" : ""}
-          >
-            🔄 En cours
-          </option>
-
-
-          <option
-            value="Terminé"
-            ${status === "Terminé" ? "selected" : ""}
-          >
-            ✅ Terminé
-          </option>
-
-
-          <option
-            value="Annulé"
-            ${status === "Annulé" ? "selected" : ""}
-          >
-            ❌ Annulé
-          </option>
-
-        </select>
-
-
-        ${
-          whatsapp
-          ?
-
-          `<button
-            class="whatsapp"
-            data-phone="${escapeHtml(whatsapp)}"
-          >
-            📱 WhatsApp
-          </button>`
-
-          :
-
-          ""
-        }
-
-
-        ${
-          link
-          ?
-
-          `<button
-            class="open-link"
-            data-link="${escapeHtml(link)}"
-          >
-            🔗 Ouvrir le lien
-          </button>`
-
-          :
-
-          ""
-        }
-
-
-      </div>
-
-    `;
-
-
-    /* =========================
-       CHANGEMENT STATUT
-    ========================= */
-
-    const select =
-      card.querySelector(".status-select");
-
-
-    select.addEventListener(
-      "change",
-      async function() {
-
-        await changeStatus(
-          order.id,
-          this.value
-        );
-
-      }
-    );
-
-
-    /* =========================
-       WHATSAPP
-    ========================= */
-
-    const whatsappButton =
-      card.querySelector(".whatsapp");
-
-
-    if (whatsappButton) {
-
-      whatsappButton.addEventListener(
-        "click",
-        () => {
-
-          openWhatsApp(
-            whatsappButton.dataset.phone
-          );
-
-        }
-      );
-
-    }
-
-
-    /* =========================
-       LIEN
-    ========================= */
-
-    const linkButton =
-      card.querySelector(".open-link");
-
-
-    if (linkButton) {
-
-      linkButton.addEventListener(
-        "click",
-        () => {
-
-          openOrderLink(
-            linkButton.dataset.link
-          );
-
-        }
-      );
-
-    }
-
-
-    return card;
-
-  }
-
-
-  /* =========================
-     MODIFIER STATUT
-  ========================= */
-
-  async function changeStatus(
-    orderId,
-    newStatus
-  ) {
+  window.changeStatus = async function (orderId) {
 
     try {
 
+      const select =
+        document.getElementById("status-" + orderId);
+
+      const newStatus = select.value;
+
+
       await updateDoc(
-
-        doc(
-          db,
-          "commandes",
-          orderId
-        ),
-
+        doc(db, "commandes", orderId),
         {
           statut: newStatus
         }
-
       );
 
 
-      const order =
-        allOrders.find(
-          item =>
-            item.id === orderId
-        );
+      /* Mettre à jour l'affichage local */
 
+      const order = allOrders.find(
+        item => item.id === orderId
+      );
 
       if (order) {
-
-        order.statut =
-          newStatus;
-
+        order.statut = newStatus;
       }
 
 
-      updateStats(allOrders);
+      updateStats();
+      displayOrders();
 
 
-      displayOrders(
-        filterOrders()
+      showSuccess(
+        "Statut modifié : " + newStatus
       );
-
-
-      document.getElementById(
-        "message"
-      ).innerHTML = `
-
-        <div class="success">
-
-          ✅ Statut mis à jour :
-          <strong>
-            ${escapeHtml(newStatus)}
-          </strong>
-
-        </div>
-
-      `;
 
 
     } catch (error) {
 
       console.error(error);
 
-
-      document.getElementById(
-        "message"
-      ).innerHTML = `
-
-        <div class="error">
-
-          ❌ Impossible de modifier le statut.
-
-          <br><br>
-
-          <strong>Code :</strong>
-          ${escapeHtml(error.code || "inconnu")}
-
-        </div>
-
-      `;
-
-    }
-
-  }
-
-
-  /* =========================
-     STATISTIQUES
-  ========================= */
-
-  function updateStats(orders) {
-
-    let total = 0;
-
-    let pending = 0;
-
-    let progress = 0;
-
-    let completed = 0;
-
-    let cancelled = 0;
-
-
-    orders.forEach(order => {
-
-      const price =
-        Number(
-          order.prix ??
-          order.price ??
-          0
-        );
-
-
-      if (!isNaN(price)) {
-
-        total += price;
-
-      }
-
-
-      const status =
-        order.statut ??
-        order.status ??
-        "En attente";
-
-
-      if (status === "En attente") {
-
-        pending++;
-
-      }
-
-      else if (status === "En cours") {
-
-        progress++;
-
-      }
-
-      else if (status === "Terminé") {
-
-        completed++;
-
-      }
-
-      else if (status === "Annulé") {
-
-        cancelled++;
-
-      }
-
-    });
-
-
-    document.getElementById(
-      "totalOrders"
-    ).textContent =
-      orders.length;
-
-
-    document.getElementById(
-      "totalAmount"
-    ).textContent =
-      formatMoney(total);
-
-
-    document.getElementById(
-      "pendingOrders"
-    ).textContent =
-      pending;
-
-
-    document.getElementById(
-      "progressOrders"
-    ).textContent =
-      progress;
-
-
-    document.getElementById(
-      "completedOrders"
-    ).textContent =
-      completed;
-
-
-    document.getElementById(
-      "cancelledOrders"
-    ).textContent =
-      cancelled;
-
-  }
-
-
-  /* =========================
-     RECHERCHE
-  ========================= */
-
-  document.getElementById(
-    "search"
-  ).addEventListener(
-    "input",
-    function() {
-
-      displayOrders(
-        filterOrders(this.value)
+      showError(
+        "Impossible de modifier le statut : " +
+        error.message
       );
 
     }
-  );
+
+  };
 
 
-  function filterOrders(
-    searchValue =
-      document.getElementById("search").value
-  ) {
+  /* =========================================================
+     DECONNEXION
+     ========================================================= */
 
-    const search =
-      String(searchValue)
-        .toLowerCase()
-        .trim();
+  window.logoutAdmin = async function () {
 
+    try {
 
-    if (!search) {
+      await signOut(auth);
 
-      return allOrders;
+      window.location.href = "connexion.html";
 
-    }
+    } catch (error) {
 
-
-    return allOrders.filter(
-      order => {
-
-        const text = [
-
-          order.id,
-
-          order.email,
-
-          order.service,
-
-          order.quantite,
-
-          order.quantity,
-
-          order.lien,
-
-          order.link,
-
-          order.whatsapp,
-
-          order.telephone,
-
-          order.phone,
-
-          order.paiement,
-
-          order.payment,
-
-          order.transaction,
-
-          order.statut,
-
-          order.status,
-
-          order.prix,
-
-          order.price
-
-        ]
-        .join(" ")
-        .toLowerCase();
-
-
-        return text.includes(search);
-
-      }
-    );
-
-  }
-
-
-  /* =========================
-     BOUTON ACTUALISER
-  ========================= */
-
-  document.getElementById(
-    "refreshBtn"
-  ).addEventListener(
-    "click",
-    () => {
-
-      loadOrders();
-
-    }
-  );
-
-
-  /* =========================
-     WHATSAPP
-  ========================= */
-
-  function openWhatsApp(phone) {
-
-    let number =
-      String(phone)
-      .replace(/\D/g, "");
-
-
-    if (!number) {
-
-      alert(
-        "Numéro WhatsApp introuvable."
+      showError(
+        "Erreur lors de la déconnexion : " +
+        error.message
       );
 
-      return;
-
     }
 
-
-    if (number.startsWith("0")) {
-
-      number =
-        "229" +
-        number.substring(1);
-
-    }
+  };
 
 
-    window.open(
-      "https://wa.me/" + number,
-      "_blank"
-    );
+  /* =========================================================
+     DATE FIREBASE
+     ========================================================= */
 
-  }
+  function formatDate(timestamp) {
 
-
-  /* =========================
-     OUVRIR LIEN
-  ========================= */
-
-  function openOrderLink(link) {
-
-    const url =
-      safeUrl(link);
-
-
-    if (!url) {
-
-      alert(
-        "Lien invalide."
-      );
-
-      return;
-
-    }
-
-
-    window.open(
-      url,
-      "_blank"
-    );
-
-  }
-
-
-  /* =========================
-     ARGENT
-  ========================= */
-
-  function formatMoney(amount) {
-
-    return Number(
-      amount || 0
-    ).toLocaleString(
-      "fr-FR"
-    ) + " FCFA";
-
-  }
-
-
-  /* =========================
-     DATE
-  ========================= */
-
-  function formatDate(date) {
-
-    if (!date) {
-
-      return "-";
-
+    if (!timestamp) {
+      return "Date inconnue";
     }
 
 
     try {
 
-      if (
-        typeof date.toDate ===
-        "function"
-      ) {
+      let date;
 
-        return date
-          .toDate()
-          .toLocaleString(
-            "fr-FR"
-          );
 
+      if (timestamp.toDate) {
+        date = timestamp.toDate();
+      } else if (timestamp.seconds) {
+        date = new Date(timestamp.seconds * 1000);
+      } else {
+        return "Date inconnue";
       }
 
 
-      if (date.seconds) {
+      return date.toLocaleString("fr-FR");
 
-        return new Date(
-          date.seconds * 1000
-        ).toLocaleString(
-          "fr-FR"
-        );
+    } catch (error) {
 
-      }
-
-
-      return new Date(
-        date
-      ).toLocaleString(
-        "fr-FR"
-      );
-
-
-    } catch {
-
-      return "-";
+      return "Date inconnue";
 
     }
 
   }
 
 
-  /* =========================
-  
+  /* =========================================================
+     SECURITE AFFICHAGE TEXTE
+     ========================================================= */
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* =========================================================
+     URL SECURISEE
+     ========================================================= */
+
+  function safeUrl(url) {
+
+    try {
+
+      const parsed = new URL(url);
+
+      if (
+        parsed.protocol === "http:" ||
+        parsed.protocol === "https:"
+      ) {
+        return parsed.href;
+      }
+
+    } catch (error) {}
+
+    return "#";
+
+  }
+
+</script>
+
+</body>
+    </html>
