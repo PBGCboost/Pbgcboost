@@ -313,13 +313,17 @@ import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
+  getAuth,
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
   getFirestore,
   collection,
   getDocs,
   doc,
-  updateDoc,
-  orderBy,
-  query
+  updateDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -335,10 +339,33 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 let allOrders = [];
 
+onAuthStateChanged(auth, (user) => {
+
+  if (!user) {
+    document.getElementById("message").innerHTML = `
+      <div class="error">
+        ❌ Vous devez être connecté comme administrateur.
+      </div>
+    `;
+    return;
+  }
+
+  loadOrders();
+});
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBhRZ1j_CpbsQoMromaM2FlomLGD5sBwEQ",
+  authDomain: "pbgcboost.firebaseapp.com",
+  projectId: "pbgcboost",
+  storageBucket: "pbgcboost.firebasestorage.app",
+  messagingSenderId: "1086041371195",
+  appId: "1:1086041371195:web:3ade541590b85a5595221e"
+};
 
 async function loadOrders() {
 
