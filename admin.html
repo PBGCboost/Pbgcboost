@@ -148,10 +148,6 @@
       word-break: break-all;
     }
 
-    .link:hover {
-      text-decoration: underline;
-    }
-
     .actions {
       display: flex;
       gap: 8px;
@@ -225,6 +221,22 @@
       margin-bottom: 15px;
     }
 
+    .success {
+      background: #d1e7dd;
+      color: #0f5132;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .login-box {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -236,6 +248,14 @@
 
       .order {
         padding: 14px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+      }
+
+      #search {
+        width: 100%;
       }
     }
   </style>
@@ -257,8 +277,8 @@
   >
 
   <button
+    id="refreshBtn"
     class="refresh-btn"
-    onclick="loadOrders()"
   >
     🔄 Actualiser
   </button>
@@ -302,496 +322,720 @@
 <div id="message"></div>
 
 <div id="orders" class="orders">
+
   <div class="loading">
-    Chargement des commandes...
+    Vérification de l'administrateur...
   </div>
+
 </div>
+
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import {
-  getAuth,
-  onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  updateDoc
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    updateDoc
+  }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBhRZ1j_CpbsQoMromaM2FlomLGD5sBwEQ",
-  authDomain: "pbgcboost.firebaseapp.com",
-  projectId: "pbgcboost",
-  storageBucket: "pbgcboost.firebasestorage.app",
-  messagingSenderId: "1086041371195",
-  appId: "1:1086041371195:web:3ade541590b85a5595221e"
-};
+  /* =========================
+     FIREBASE
+  ========================= */
 
-const app = initializeApp(firebaseConfig);
+  const firebaseConfig = {
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+    apiKey: "AIzaSyBhRZ1j_CpbsQoMromaM2FlomLGD5sBwEQ",
 
-let allOrders = [];
+    authDomain: "pbgcboost.firebaseapp.com",
 
-onAuthStateChanged(auth, (user) => {
+    projectId: "pbgcboost",
 
-  if (!user) {
+    storageBucket: "pbgcboost.firebasestorage.app",
+
+    messagingSenderId: "1086041371195",
+
+    appId: "1:1086041371195:web:3ade541590b85a5595221e"
+
+  };
+
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+  const db = getFirestore(app);
+
+
+  /* =========================
+     UID ADMINISTRATEUR
+  ========================= */
+
+  const ADMIN_UID =
+    "XZT7MEF2I1fCWBc5reTUU9Cegnk1";
+
+
+  let allOrders = [];
+
+
+  /* =========================
+     AUTHENTIFICATION
+  ========================= */
+
+  onAuthStateChanged(auth, async (user) => {
+
+    if (!user) {
+
+      document.getElementById("orders").innerHTML = `
+        <div class="login-box">
+          <h3>🔐 Connexion nécessaire</h3>
+          <p>Vous devez être connecté pour accéder à l'administration.</p>
+          <button
+            class="refresh-btn"
+            onclick="window.location.href='connexion.html'"
+          >
+            Se connecter
+          </button>
+        </div>
+      `;
+
+      return;
+    }
+
+
+    if (user.uid !== ADMIN_UID) {
+
+      document.getElementById("orders").innerHTML = `
+        <div class="error">
+          ❌ Accès administrateur refusé.
+          <br><br>
+          Le compte connecté n'est pas le compte administrateur.
+        </div>
+      `;
+
+      return;
+    }
+
+
     document.getElementById("message").innerHTML = `
-      <div class="error">
-        ❌ Vous devez être connecté comme administrateur.
-      </div>
-    `;
-    return;
-  }
-
-  loadOrders();
-});
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBhRZ1j_CpbsQoMromaM2FlomLGD5sBwEQ",
-  authDomain: "pbgcboost.firebaseapp.com",
-  projectId: "pbgcboost",
-  storageBucket: "pbgcboost.firebasestorage.app",
-  messagingSenderId: "1086041371195",
-  appId: "1:1086041371195:web:3ade541590b85a5595221e"
-};
-
-async function loadOrders() {
-
-  const ordersContainer =
-    document.getElementById("orders");
-
-  const message =
-    document.getElementById("message");
-
-  ordersContainer.innerHTML =
-    '<div class="loading">Connexion à Firebase...</div>';
-
-  message.innerHTML = "";
-
-  try {
-
-    const snapshot =
-      await getDocs(
-        collection(db, "commandes")
-      );
-
-    allOrders = [];
-
-    snapshot.forEach((document) => {
-
-      allOrders.push({
-        id: document.id,
-        ...document.data()
-      });
-
-    });
-
-    displayOrders(allOrders);
-
-    updateStats(allOrders);
-
-  } catch (error) {
-
-    console.error("ERREUR FIREBASE :", error);
-
-    ordersContainer.innerHTML = "";
-
-    message.innerHTML = `
-      <div class="error">
-        ❌ ERREUR FIREBASE
-        <br><br>
-        <strong>Code :</strong>
-        ${escapeHtml(error.code || "inconnu")}
-        <br><br>
-        <strong>Message :</strong>
-        ${escapeHtml(error.message || "Erreur inconnue")}
+      <div class="success">
+        ✅ Administrateur reconnu.
       </div>
     `;
 
-  }
 
-  }
-
-
-function displayOrders(orders) {
-
-  const container =
-    document.getElementById("orders");
-
-  if (orders.length === 0) {
-
-    container.innerHTML = `
-      <div class="empty">
-        📭 Aucune commande trouvée.
-      </div>
-    `;
-
-    return;
-
-  }
-
-  container.innerHTML = "";
-
-  orders.forEach(order => {
-
-    const card =
-      createOrderCard(order);
-
-    container.appendChild(card);
+    await loadOrders();
 
   });
 
-}
+
+  /* =========================
+     CHARGER LES COMMANDES
+  ========================= */
+
+  async function loadOrders() {
+
+    const ordersContainer =
+      document.getElementById("orders");
+
+    const message =
+      document.getElementById("message");
 
 
-function createOrderCard(order) {
-
-  const card =
-    document.createElement("div");
-
-  card.className = "order";
+    ordersContainer.innerHTML =
+      '<div class="loading">📦 Chargement des commandes...</div>';
 
 
-  const quantity =
-    order.quantite ??
-    order.quantity ??
-    "-";
+    try {
+
+      const snapshot =
+        await getDocs(
+          collection(db, "commandes")
+        );
 
 
-  const link =
-    order.lien ??
-    order.link ??
-    "";
+      allOrders = [];
 
 
-  const whatsapp =
-    order.whatsapp ??
-    order.telephone ??
-    order.phone ??
-    order.numero ??
-    "";
+      snapshot.forEach((document) => {
+
+        allOrders.push({
+
+          id: document.id,
+
+          ...document.data()
+
+        });
+
+      });
 
 
-  const email =
-    order.email ??
-    "";
+      displayOrders(allOrders);
+
+      updateStats(allOrders);
 
 
-  const service =
-    order.service ??
-    "-";
+    } catch (error) {
+
+      console.error(
+        "ERREUR FIREBASE :",
+        error
+      );
 
 
-  const prix =
-    Number(
-      order.prix ??
-      order.price ??
-      0
+      ordersContainer.innerHTML = "";
+
+
+      message.innerHTML = `
+        <div class="error">
+
+          ❌ ERREUR FIREBASE
+
+          <br><br>
+
+          <strong>Code :</strong>
+          ${escapeHtml(error.code || "inconnu")}
+
+          <br><br>
+
+          <strong>Message :</strong>
+          ${escapeHtml(error.message || "Erreur inconnue")}
+
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  /* =========================
+     AFFICHER COMMANDES
+  ========================= */
+
+  function displayOrders(orders) {
+
+    const container =
+      document.getElementById("orders");
+
+
+    if (orders.length === 0) {
+
+      container.innerHTML = `
+        <div class="empty">
+          📭 Aucune commande trouvée.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    orders.forEach(order => {
+
+      const card =
+        createOrderCard(order);
+
+
+      container.appendChild(card);
+
+    });
+
+  }
+
+
+  /* =========================
+     CARTE COMMANDE
+  ========================= */
+
+  function createOrderCard(order) {
+
+    const card =
+      document.createElement("div");
+
+
+    card.className = "order";
+
+
+    const quantity =
+      order.quantite ??
+      order.quantity ??
+      "-";
+
+
+    const link =
+      order.lien ??
+      order.link ??
+      "";
+
+
+    const whatsapp =
+      order.whatsapp ??
+      order.telephone ??
+      order.phone ??
+      order.numero ??
+      "";
+
+
+    const email =
+      order.email ??
+      "";
+
+
+    const service =
+      order.service ??
+      "-";
+
+
+    const prix =
+      Number(
+        order.prix ??
+        order.price ??
+        0
+      );
+
+
+    const paiement =
+      order.paiement ??
+      order.payment ??
+      "-";
+
+
+    const transaction =
+      order.transaction ??
+      "-";
+
+
+    const status =
+      order.statut ??
+      order.status ??
+      "En attente";
+
+
+    const date =
+      formatDate(order.date);
+
+
+    card.innerHTML = `
+
+      <div class="order-header">
+
+        <div>
+
+          <div class="order-id">
+
+            📦 Commande #${escapeHtml(order.id)}
+
+          </div>
+
+          <small>
+            ${escapeHtml(date)}
+          </small>
+
+        </div>
+
+
+        <div>
+
+          <span
+            class="status ${getStatusClass(status)}"
+          >
+            ${escapeHtml(status)}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="order-info">
+
+
+        <div class="info">
+
+          <strong>👤 Email</strong>
+
+          <span>
+            ${escapeHtml(email || "-")}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>🛠️ Service</strong>
+
+          <span>
+            ${escapeHtml(service)}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>🔢 Quantité</strong>
+
+          <span>
+            ${escapeHtml(quantity)}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>💰 Prix</strong>
+
+          <span>
+            ${formatMoney(prix)}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>💳 Paiement</strong>
+
+          <span>
+            ${escapeHtml(paiement)}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>🧾 Transaction</strong>
+
+          <span>
+            ${escapeHtml(transaction)}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>📱 WhatsApp</strong>
+
+          <span>
+            ${escapeHtml(whatsapp || "-")}
+          </span>
+
+        </div>
+
+
+        <div class="info">
+
+          <strong>🔗 Lien à booster</strong>
+
+          <span>
+
+            ${
+              link
+              ?
+
+              `<a
+                class="link"
+                href="${safeUrl(link)}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ouvrir le lien
+              </a>`
+
+              :
+
+              "-"
+            }
+
+          </span>
+
+        </div>
+
+
+      </div>
+
+
+      <div class="actions">
+
+
+        <select class="status-select">
+
+          <option
+            value="En attente"
+            ${status === "En attente" ? "selected" : ""}
+          >
+            ⏳ En attente
+          </option>
+
+
+          <option
+            value="En cours"
+            ${status === "En cours" ? "selected" : ""}
+          >
+            🔄 En cours
+          </option>
+
+
+          <option
+            value="Terminé"
+            ${status === "Terminé" ? "selected" : ""}
+          >
+            ✅ Terminé
+          </option>
+
+
+          <option
+            value="Annulé"
+            ${status === "Annulé" ? "selected" : ""}
+          >
+            ❌ Annulé
+          </option>
+
+        </select>
+
+
+        ${
+          whatsapp
+          ?
+
+          `<button
+            class="whatsapp"
+            data-phone="${escapeHtml(whatsapp)}"
+          >
+            📱 WhatsApp
+          </button>`
+
+          :
+
+          ""
+        }
+
+
+        ${
+          link
+          ?
+
+          `<button
+            class="open-link"
+            data-link="${escapeHtml(link)}"
+          >
+            🔗 Ouvrir le lien
+          </button>`
+
+          :
+
+          ""
+        }
+
+
+      </div>
+
+    `;
+
+
+    /* =========================
+       CHANGEMENT STATUT
+    ========================= */
+
+    const select =
+      card.querySelector(".status-select");
+
+
+    select.addEventListener(
+      "change",
+      async function() {
+
+        await changeStatus(
+          order.id,
+          this.value
+        );
+
+      }
     );
 
 
-  const paiement =
-    order.paiement ??
-    order.payment ??
-    "-";
+    /* =========================
+       WHATSAPP
+    ========================= */
+
+    const whatsappButton =
+      card.querySelector(".whatsapp");
 
 
-  const transaction =
-    order.transaction ??
-    "-";
+    if (whatsappButton) {
 
+      whatsappButton.addEventListener(
+        "click",
+        () => {
 
-  const status =
-    order.statut ??
-    order.status ??
-    "En attente";
+          openWhatsApp(
+            whatsappButton.dataset.phone
+          );
 
-
-  const date =
-    formatDate(order.date);
-
-
-  card.innerHTML = `
-
-    <div class="order-header">
-
-      <div>
-
-        <div class="order-id">
-          📦 Commande #${escapeHtml(order.id)}
-        </div>
-
-        <small>
-          ${date}
-        </small>
-
-      </div>
-
-      <div>
-
-        <span class="status ${getStatusClass(status)}">
-          ${escapeHtml(status)}
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="order-info">
-
-      <div class="info">
-        <strong>👤 Email</strong>
-        <span>
-          ${escapeHtml(email || "-")}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>🛠️ Service</strong>
-        <span>
-          ${escapeHtml(service)}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>🔢 Quantité</strong>
-        <span>
-          ${escapeHtml(quantity)}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>💰 Prix</strong>
-        <span>
-          ${formatMoney(prix)}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>💳 Paiement</strong>
-        <span>
-          ${escapeHtml(paiement)}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>🧾 Transaction</strong>
-        <span>
-          ${escapeHtml(transaction)}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>📱 WhatsApp</strong>
-        <span>
-          ${escapeHtml(whatsapp || "-")}
-        </span>
-      </div>
-
-
-      <div class="info">
-        <strong>🔗 Lien à booster</strong>
-
-        <span>
-
-          ${
-            link
-            ?
-            `<a
-              class="link"
-              href="${safeUrl(link)}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Ouvrir le lien
-            </a>`
-            :
-            "-"
-          }
-
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="actions">
-
-      <select
-        class="status-select"
-        data-id="${escapeHtml(order.id)}"
-      >
-
-        <option
-          value="En attente"
-          ${status === "En attente" ? "selected" : ""}
-        >
-          ⏳ En attente
-        </option>
-
-        <option
-          value="En cours"
-          ${status === "En cours" ? "selected" : ""}
-        >
-          🔄 En cours
-        </option>
-
-        <option
-          value="Terminé"
-          ${status === "Terminé" ? "selected" : ""}
-        >
-          ✅ Terminé
-        </option>
-
-        <option
-          value="Annulé"
-          ${status === "Annulé" ? "selected" : ""}
-        >
-          ❌ Annulé
-        </option>
-
-      </select>
-
-
-      ${
-        whatsapp
-        ?
-        `
-        <button
-          class="whatsapp"
-          onclick="openWhatsApp('${escapeJs(whatsapp)}')"
-        >
-          📱 WhatsApp
-        </button>
-        `
-        :
-        ""
-      }
-
-
-      ${
-        link
-        ?
-        `
-        <button
-          class="open-link"
-          onclick="openOrderLink('${escapeJs(link)}')"
-        >
-          🔗 Ouvrir le lien
-        </button>
-        `
-        :
-        ""
-      }
-
-    </div>
-
-  `;
-
-
-  const select =
-    card.querySelector(".status-select");
-
-
-  select.addEventListener(
-    "change",
-    async function () {
-
-      await changeStatus(
-        order.id,
-        this.value
+        }
       );
 
     }
-  );
 
 
-  return card;
+    /* =========================
+       LIEN
+    ========================= */
 
-}
-    /*
-  ============================================================
-  CHANGER LE STATUT
-  ============================================================
-  */
+    const linkButton =
+      card.querySelector(".open-link");
 
-  async function changeStatus(orderId, newStatus) {
+
+    if (linkButton) {
+
+      linkButton.addEventListener(
+        "click",
+        () => {
+
+          openOrderLink(
+            linkButton.dataset.link
+          );
+
+        }
+      );
+
+    }
+
+
+    return card;
+
+  }
+
+
+  /* =========================
+     MODIFIER STATUT
+  ========================= */
+
+  async function changeStatus(
+    orderId,
+    newStatus
+  ) {
 
     try {
 
       await updateDoc(
-        doc(db, "commandes", orderId),
+
+        doc(
+          db,
+          "commandes",
+          orderId
+        ),
+
         {
           statut: newStatus
         }
+
       );
+
 
       const order =
         allOrders.find(
-          item => item.id === orderId
+          item =>
+            item.id === orderId
         );
 
+
       if (order) {
-        order.statut = newStatus;
+
+        order.statut =
+          newStatus;
+
       }
 
+
       updateStats(allOrders);
+
 
       displayOrders(
         filterOrders()
       );
 
-      showMessage(
-        "✅ Statut mis à jour."
-      );
+
+      document.getElementById(
+        "message"
+      ).innerHTML = `
+
+        <div class="success">
+
+          ✅ Statut mis à jour :
+          <strong>
+            ${escapeHtml(newStatus)}
+          </strong>
+
+        </div>
+
+      `;
+
 
     } catch (error) {
 
       console.error(error);
 
-      showMessage(
-        "❌ Erreur lors de la modification du statut.",
-        true
-      );
+
+      document.getElementById(
+        "message"
+      ).innerHTML = `
+
+        <div class="error">
+
+          ❌ Impossible de modifier le statut.
+
+          <br><br>
+
+          <strong>Code :</strong>
+          ${escapeHtml(error.code || "inconnu")}
+
+        </div>
+
+      `;
 
     }
 
   }
 
 
-  /*
-  ============================================================
-  STATISTIQUES
-  ============================================================
-  */
+  /* =========================
+     STATISTIQUES
+  ========================= */
 
   function updateStats(orders) {
 
     let total = 0;
+
     let pending = 0;
+
     let progress = 0;
+
     let completed = 0;
+
     let cancelled = 0;
+
 
     orders.forEach(order => {
 
@@ -802,29 +1046,42 @@ function createOrderCard(order) {
           0
         );
 
-      total += isNaN(price)
-        ? 0
-        : price;
+
+      if (!isNaN(price)) {
+
+        total += price;
+
+      }
+
 
       const status =
         order.statut ??
         order.status ??
         "En attente";
 
+
       if (status === "En attente") {
+
         pending++;
+
       }
 
       else if (status === "En cours") {
+
         progress++;
+
       }
 
       else if (status === "Terminé") {
+
         completed++;
+
       }
 
       else if (status === "Annulé") {
+
         cancelled++;
+
       }
 
     });
@@ -868,22 +1125,19 @@ function createOrderCard(order) {
   }
 
 
-  /*
-  ============================================================
-  RECHERCHE
-  ============================================================
-  */
+  /* =========================
+     RECHERCHE
+  ========================= */
 
   document.getElementById(
     "search"
   ).addEventListener(
     "input",
-    function () {
+    function() {
 
-      const filtered =
-        filterOrders(this.value);
-
-      displayOrders(filtered);
+      displayOrders(
+        filterOrders(this.value)
+      );
 
     }
   );
@@ -895,138 +1149,157 @@ function createOrderCard(order) {
   ) {
 
     const search =
-      searchValue
+      String(searchValue)
         .toLowerCase()
         .trim();
 
 
     if (!search) {
+
       return allOrders;
+
     }
 
 
-    return allOrders.filter(order => {
+    return allOrders.filter(
+      order => {
 
-      const text = [
+        const text = [
 
-        order.id,
-        order.email,
-        order.service,
-        order.quantite,
-        order.quantity,
-        order.lien,
-        order.link,
-        order.whatsapp,
-        order.telephone,
-        order.phone,
-        order.paiement,
-        order.payment,
-        order.transaction,
-        order.statut,
-        order.status,
-        order.prix,
-        order.price
+          order.id,
 
-      ]
-      .join(" ")
-      .toLowerCase();
+          order.email,
+
+          order.service,
+
+          order.quantite,
+
+          order.quantity,
+
+          order.lien,
+
+          order.link,
+
+          order.whatsapp,
+
+          order.telephone,
+
+          order.phone,
+
+          order.paiement,
+
+          order.payment,
+
+          order.transaction,
+
+          order.statut,
+
+          order.status,
+
+          order.prix,
+
+          order.price
+
+        ]
+        .join(" ")
+        .toLowerCase();
 
 
-      return text.includes(search);
+        return text.includes(search);
 
-    });
+      }
+    );
 
   }
 
 
-  /*
-  ============================================================
-  WHATSAPP
-  ============================================================
-  */
+  /* =========================
+     BOUTON ACTUALISER
+  ========================= */
 
-  window.openWhatsApp =
-    function(phone) {
+  document.getElementById(
+    "refreshBtn"
+  ).addEventListener(
+    "click",
+    () => {
 
-      let number =
-        String(phone)
-        .replace(/\D/g, "");
+      loadOrders();
 
-
-      if (!number) {
-
-        alert(
-          "Numéro WhatsApp introuvable."
-        );
-
-        return;
-
-      }
+    }
+  );
 
 
-      /*
-      Si le numéro commence par 0,
-      on ajoute automatiquement
-      l'indicatif du Bénin 229.
-      */
+  /* =========================
+     WHATSAPP
+  ========================= */
 
-      if (
-        number.startsWith("0")
-      ) {
+  function openWhatsApp(phone) {
 
-        number =
-          "229" +
-          number.substring(1);
-
-      }
+    let number =
+      String(phone)
+      .replace(/\D/g, "");
 
 
-      window.open(
-        "https://wa.me/" + number,
-        "_blank"
+    if (!number) {
+
+      alert(
+        "Numéro WhatsApp introuvable."
       );
 
-    };
+      return;
+
+    }
 
 
-  /*
-  ============================================================
-  OUVRIR LE LIEN
-  ============================================================
-  */
+    if (number.startsWith("0")) {
 
-  window.openOrderLink =
-    function(link) {
+      number =
+        "229" +
+        number.substring(1);
 
-      const url =
-        safeUrl(link);
+    }
 
 
-      if (!url) {
+    window.open(
+      "https://wa.me/" + number,
+      "_blank"
+    );
 
-        alert(
-          "Lien invalide."
-        );
-
-        return;
-
-      }
+  }
 
 
-      window.open(
-        url,
-        "_blank",
-        "noopener,noreferrer"
+  /* =========================
+     OUVRIR LIEN
+  ========================= */
+
+  function openOrderLink(link) {
+
+    const url =
+      safeUrl(link);
+
+
+    if (!url) {
+
+      alert(
+        "Lien invalide."
       );
 
-    };
+      return;
+
+    }
 
 
-  /*
-  ============================================================
-  FORMAT ARGENT
-  ============================================================
-  */
+    window.open(
+      url,
+      "_blank"
+    );
+
+  }
+
+
+  /* =========================
+     ARGENT
+  ========================= */
 
   function formatMoney(amount) {
 
@@ -1039,16 +1312,16 @@ function createOrderCard(order) {
   }
 
 
-  /*
-  ============================================================
-  FORMAT DATE
-  ============================================================
-  */
+  /* =========================
+     DATE
+  ========================= */
 
   function formatDate(date) {
 
     if (!date) {
+
       return "-";
+
     }
 
 
@@ -1085,9 +1358,8 @@ function createOrderCard(order) {
         "fr-FR"
       );
 
-    }
 
-    catch {
+    } catch {
 
       return "-";
 
@@ -1096,167 +1368,5 @@ function createOrderCard(order) {
   }
 
 
-  /*
-  ============================================================
-  COULEUR DU STATUT
-  ============================================================
-  */
-
-  function getStatusClass(status) {
-
-    switch (status) {
-
-      case "En cours":
-        return "status-en-cours";
-
-      case "Terminé":
-        return "status-termine";
-
-      case "Annulé":
-        return "status-annule";
-
-      default:
-        return "status-en-attente";
-
-    }
-
-  }
-
-
-  /*
-  ============================================================
-  PROTECTION AFFICHAGE HTML
-  ============================================================
-  */
-
-  function escapeHtml(value) {
-
-    return String(
-      value ?? ""
-    )
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-  }
-
-
-  function escapeJs(value) {
-
-    return String(
-      value ?? ""
-    )
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r");
-
-  }
-
-
-  /*
-  ============================================================
-  SECURISER LES LIENS
-  ============================================================
-  */
-
-  function safeUrl(value) {
-
-    try {
-
-      const url =
-        new URL(
-          String(value)
-        );
-
-
-      if (
-        url.protocol === "http:" ||
-        url.protocol === "https:"
-      ) {
-
-        return url.href;
-
-      }
-
-
-      return "";
-
-    }
-
-    catch {
-
-      return "";
-
-    }
-
-  }
-
-
-  /*
-  ============================================================
-  MESSAGE
-  ============================================================
-  */
-
-  function showMessage(
-    text,
-    isError = false
-  ) {
-
-    const message =
-      document.getElementById(
-        "message"
-      );
-
-
-    message.innerHTML = `
-
-      <div
-        style="
-          padding:12px;
-          margin-bottom:15px;
-          background:${
-            isError
-            ? "#f8d7da"
-            : "#d1e7dd"
-          };
-          color:${
-            isError
-            ? "#842029"
-            : "#0f5132"
-          };
-          border-radius:8px;
-        "
-      >
-        ${escapeHtml(text)}
-      </div>
-
-    `;
-
-
-    setTimeout(
-      () => {
-        message.innerHTML = "";
-      },
-      3000
-    );
-
-  }
-
-
-  /*
-  ============================================================
-  LANCEMENT
-  ============================================================
-  */
-
-  loadOrders();
-
-</script>
-
-</body>
-</html>
+  /* =========================
+  
