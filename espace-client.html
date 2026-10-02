@@ -39,6 +39,39 @@ border-radius:12px;
 box-shadow:0 2px 8px #ccc;
 }
 
+/* SOLDE */
+
+.solde-card{
+background:#198754;
+color:white;
+text-align:center;
+}
+
+.solde{
+font-size:32px;
+font-weight:bold;
+margin:15px 0;
+}
+
+.depot{
+display:block;
+background:#ffc107;
+color:#212529;
+padding:14px;
+margin-top:10px;
+border-radius:8px;
+text-decoration:none;
+font-weight:bold;
+text-align:center;
+}
+
+#messageSolde{
+margin-top:10px;
+font-size:14px;
+}
+
+/* SERVICES */
+
 .service{
 display:block;
 background:#1877f2;
@@ -49,6 +82,8 @@ border-radius:8px;
 text-decoration:none;
 }
 
+/* BOUTON */
+
 button{
 background:#d9534f;
 color:white;
@@ -56,6 +91,8 @@ padding:12px 20px;
 border:none;
 border-radius:8px;
 }
+
+/* COMMANDES */
 
 .commande{
 background:#f8f9fa;
@@ -126,6 +163,8 @@ Déconnexion
 <div class="container">
 
 
+<!-- BIENVENUE -->
+
 <div class="card">
 
 <h2>Bienvenue dans votre espace client</h2>
@@ -133,6 +172,27 @@ Déconnexion
 <p>
 Vous pouvez suivre ici l'état de vos commandes.
 </p>
+
+</div>
+
+
+<!-- SOLDE -->
+
+<div class="card solde-card">
+
+<h2>💰 Mon solde</h2>
+
+<div class="solde" id="solde">
+0 FCFA
+</div>
+
+<a class="depot" href="depot.html">
+➕ Déposer de l'argent
+</a>
+
+<div id="messageSolde">
+Chargement du solde...
+</div>
 
 </div>
 
@@ -210,16 +270,19 @@ href="telegram.html">
 
 <script type="module">
 
+
 import {
 initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
 import {
 getAuth,
 onAuthStateChanged,
 signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
 import {
@@ -227,8 +290,10 @@ getFirestore,
 collection,
 query,
 where,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+onSnapshot,
+doc
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 
@@ -256,11 +321,75 @@ appId:
 
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const auth =
+getAuth(app);
 
-const db = getFirestore(app);
+const db =
+getFirestore(app);
+
+
+
+/* =========================
+   AFFICHER LE SOLDE
+========================= */
+
+function afficherSolde(user){
+
+const soldeElement =
+document.getElementById("solde");
+
+const messageSolde =
+document.getElementById("messageSolde");
+
+
+const userRef =
+doc(db,"users",user.uid);
+
+
+onSnapshot(
+userRef,
+(snapshot)=>{
+
+if(snapshot.exists()){
+
+const data =
+snapshot.data();
+
+const solde =
+Number(data.solde || 0);
+
+soldeElement.textContent =
+solde.toLocaleString("fr-FR")
++ " FCFA";
+
+messageSolde.textContent =
+"Solde disponible";
+
+}else{
+
+soldeElement.textContent =
+"0 FCFA";
+
+messageSolde.textContent =
+"Votre solde est actuellement de 0 FCFA.";
+
+}
+
+},
+(error)=>{
+
+console.error(error);
+
+messageSolde.textContent =
+"Impossible de charger le solde.";
+
+}
+);
+
+}
 
 
 
@@ -308,7 +437,8 @@ message.textContent = "";
 
 snapshot.forEach((doc)=>{
 
-const commande = doc.data();
+const commande =
+doc.data();
 
 
 let statut =
@@ -405,7 +535,6 @@ liste.appendChild(div);
 
 });
 
-
 }
 
 
@@ -427,6 +556,8 @@ return;
 
 }
 
+
+afficherSolde(user);
 
 afficherCommandes(user);
 
@@ -451,9 +582,10 @@ window.location.href =
 
 };
 
+
 </script>
 
 
 </body>
 
-  </html>
+   </html>
