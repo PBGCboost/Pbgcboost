@@ -386,181 +386,129 @@
   }
 
 
-  async function validerDepot(
-    depotId,
-    uid,
-    montant,
-    btnValider,
-    btnRefuser
-  ) {
-
-    if (!uid) {
-
-      alert(
-        "❌ Ce dépôt ne contient pas d'identifiant client."
-      );
-
-      return;
-
-    }
-
-
-    const confirmation = confirm(
-      "Confirmer la validation de ce dépôt de " +
-      Number(montant).toLocaleString("fr-FR") +
-      " FCFA ?"
-    );
-
-
-    if (!confirmation) {
-      return;
-    }
-
-
-    btnValider.disabled = true;
-    btnRefuser.disabled = true;
-
-    btnValider.textContent =
-      "Validation...";
-
-
-    try {
-
-      await runTransaction(
-        db,
-        async (transaction) => {
-
-          const depotRef =
-            doc(db, "depots", depotId);
-
-          const userRef =
-            doc(db, "users", uid);
-
-
-          const depotSnap =
-            await transaction.get(depotRef);
-
-
-          if (!depotSnap.exists()) {
-
-            throw new Error(
-              "Dépôt introuvable."
             );
 
           }
+async function validerDepot(
+  depotId,
+  uid,
+  montant,
+  btnValider,
+  btnRefuser
+) {
 
+  if (!uid) {
+    alert("❌ Ce dépôt ne contient pas d'identifiant client.");
+    return;
+  }
 
-          const depotData =
-            depotSnap.data();
+  const amount = Number(montant);
 
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert("❌ Montant du dépôt invalide.");
+    return;
+  }
 
-          if (depotData.statut !== "En attente") {
+  const confirmation = confirm(
+    "Confirmer la validation de ce dépôt de " +
+    amount.toLocaleString("fr-FR") +
+    " FCFA ?"
+  );
 
-            throw new Error(
-              "Ce dépôt a déjà été traité."
-            );
+  if (!confirmation) {
+    return;
+  }
 
-          }
+  btnValider.disabled = true;
+  btnRefuser.disabled = true;
+  btnValider.textContent = "Validation...";
 
+  try {
 
-          const montantDepot =
-            Number(depotData.montant);
+    await runTransaction(db, async (transaction) => {
 
+      const depotRef = doc(db, "depots", depotId);
+      const userRef = doc(db, "users", uid);
 
-          if (!montantDepot || montantDepot <= 0) {
+      // Lire le dépôt
+      const depotSnap = await transaction.get(depotRef);
 
-            throw new Error(
-              "Montant du dépôt invalide."
-            );
+      if (!depotSnap.exists()) {
+        throw new Error("Dépôt introuvable.");
+      }
 
-          }
+      const depotData = depotSnap.data();
 
+      // Vérifier que le dépôt est encore en attente
+      if (depotData.statut !== "En attente") {
+        throw new Error(
+          "Ce dépôt a déjà été traité."
+        );
+      }
 
-          const userSnap =
-            await transaction.get(userRef);
+      // Lire le compte client
+      const userSnap = await transaction.get(userRef);
 
+      const userData = userSnap.exists()
+        ? userSnap.data()
+        : {};
 
-          let ancienSolde = 0;
+      const ancienSolde =
+        Number(userData.solde || 0);
 
+      const nouveauSolde =
+        ancienSolde + amount;
 
-          if (userSnap.exists()) {
-
-            ancienSolde =
-              Number(
-                userSnap.data().solde || 0
-              );
-
-          }
-
-
-          const nouveauSolde =
-            ancienSolde + montantDepot;
-
-
-          if (userSnap.exists()) {
-
-            transaction.update(
-              userRef,
-              {
-                solde: nouveauSolde
-              }
-            );
-
-          } else {
-
-            transaction.set(
-              userRef,
-              {
-                email:
-                  depotData.email || "",
-                solde:
-                  nouveauSolde
-              }
-            );
-
-          }
-
-
-          transaction.update(
-            depotRef,
-            {
-              statut: "Validé",
-              dateValidation:
-                new Date()
-            }
-          );
-
+      // Créditer le solde du client
+      transaction.set(
+        userRef,
+        {
+          solde: nouveauSolde
+        },
+        {
+          merge: true
         }
       );
 
-
-      alert(
-        "✅ Dépôt validé et solde crédité."
+      // Valider le dépôt
+      transaction.update(
+        depotRef,
+        {
+          statut: "Validé",
+          dateValidation: new Date()
+        }
       );
 
+    });
 
-    } catch (error) {
+    alert(
+      "✅ Dépôt validé !\n\n" +
+      amount.toLocaleString("fr-FR") +
+      " FCFA ont été ajoutés au solde du client."
+    );
 
-      console.error(error);
+  } catch (error) {
 
-      alert(
-        "❌ " + (
-          error.message ||
-          "Erreur lors de la validation."
-        )
-      );
+    console.error(
+      "Erreur validation dépôt :",
+      error
+    );
 
+    alert(
+      "❌ Impossible de charger le dépôt.\n\n" +
+      (error.message || "Erreur inconnue.")
+    );
 
-      btnValider.disabled = false;
-      btnRefuser.disabled = false;
+    btnValider.disabled = false;
+    btnRefuser.disabled = false;
 
-      btnValider.textContent =
-        "✅ Valider et créditer";
+    btnValider.textContent =
+      "✅ Valider et créditer";
 
-    }
-
+    return;
   }
 
+  }
 
   async function refuserDepot(
     depotId,
