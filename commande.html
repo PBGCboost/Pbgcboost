@@ -1,75 +1,116 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
 <title>Commande - PBGCboost</title>
 
 <style>
+
 body{
-font-family:Arial,sans-serif;
-background:#f4f4f4;
-margin:0;
-padding:20px;
+  font-family:Arial,sans-serif;
+  background:#f4f4f4;
+  margin:0;
+  padding:20px;
 }
 
 .container{
-max-width:600px;
-margin:auto;
-background:white;
-padding:20px;
-border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,.15);
+  max-width:600px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 2px 10px rgba(0,0,0,.15);
 }
 
 h1{
-text-align:center;
-color:#1877f2;
+  text-align:center;
+  color:#1877f2;
+}
+
+.solde{
+  background:#dcfce7;
+  color:#166534;
+  padding:16px;
+  border-radius:12px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:20px;
 }
 
 label{
-display:block;
-margin-top:15px;
-font-weight:bold;
+  display:block;
+  margin-top:15px;
+  font-weight:bold;
 }
 
-select,input,textarea{
-width:100%;
-padding:12px;
-margin-top:5px;
-border-radius:8px;
-border:1px solid #ccc;
-box-sizing:border-box;
+select,
+input{
+  width:100%;
+  padding:12px;
+  margin-top:5px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
 }
 
 .prix{
-margin-top:20px;
-padding:15px;
-background:#e8f5e9;
-border-radius:8px;
-font-size:18px;
-font-weight:bold;
+  margin-top:20px;
+  padding:15px;
+  background:#e8f5e9;
+  border-radius:8px;
+  font-size:20px;
+  font-weight:bold;
+  text-align:center;
 }
 
 .paiement{
-margin-top:20px;
-background:#fff3cd;
-padding:15px;
-border-radius:8px;
+  margin-top:20px;
+  background:#eff6ff;
+  padding:15px;
+  border-radius:10px;
+}
+
+.info{
+  margin-top:15px;
+  padding:12px;
+  background:#fef3c7;
+  border-radius:8px;
+  color:#92400e;
 }
 
 button{
-width:100%;
-margin-top:20px;
-padding:15px;
-border:none;
-border-radius:8px;
-background:#1877f2;
-color:white;
-font-size:18px;
-cursor:pointer;
+  width:100%;
+  margin-top:20px;
+  padding:15px;
+  border:none;
+  border-radius:8px;
+  background:#1877f2;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
 }
+
+button:disabled{
+  background:#999;
+  cursor:not-allowed;
+}
+
+.retour{
+  display:block;
+  margin-top:20px;
+  text-align:center;
+  text-decoration:none;
+  color:#1877f2;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -78,33 +119,64 @@ cursor:pointer;
 
 <h1>PBGCboost</h1>
 
+<div class="solde">
+💰 Mon solde :
+<span id="solde">0</span> FCFA
+</div>
+
+
 <label>Service</label>
 
 <select id="service">
+
 <option value="">Choisir...</option>
+
 <option>Facebook J'aime</option>
+
 <option>Facebook Abonnés</option>
+
 <option>TikTok J'aime</option>
+
 <option>TikTok Abonnés</option>
+
 <option>YouTube</option>
+
 <option>Instagram</option>
+
 <option>Telegram</option>
+
 </select>
+
 
 <label>Quantité</label>
 
 <select id="quantite">
+
 <option value="">Choisir...</option>
+
 <option>200</option>
+
 <option>500</option>
+
 <option>1000</option>
+
 <option>2000</option>
+
 <option>10000</option>
+
 </select>
 
+
 <div class="prix">
-Prix : <span id="prix">0</span> FCFA
+
+Prix :
+
+<span id="prix">0</span>
+
+FCFA
+
 </div>
+
 
 <label>Lien à booster</label>
 
@@ -113,276 +185,701 @@ id="lien"
 type="text"
 placeholder="Collez ici votre lien">
 
+
 <div class="paiement">
 
-<h3>Paiement</h3>
+<h3>💳 Paiement</h3>
 
-<p><b>MTN Mobile Money</b><br>
-01 90 29 75 37</p>
+<p>
+La commande sera payée automatiquement avec votre
+<strong>solde PBGCboost</strong>.
+</p>
 
-<p><b>Moov Money</b><br>
-01 68 67 76 87</p>
-
-<label>Mode de paiement</label>
-
-<select id="paiement">
-<option>MTN Mobile Money</option>
-<option>Moov Money</option>
-</select>
-
-<label>ID de transaction</label>
-
-<input
-id="transaction"
-type="text"
-placeholder="Exemple : PP240815XXXX">
+<p>
+Votre solde sera débité uniquement si le montant
+disponible est suffisant.
+</p>
 
 </div>
 
+
+<div class="info">
+
+⚠️ Vérifiez bien le service, la quantité et le lien
+avant de confirmer la commande.
+
+</div>
+
+
 <button id="envoyer">
-Envoyer la commande
-  </button>
- <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+💰 Payer avec mon solde
+
+</button>
+
+
+<a
+href="espace-client.html"
+class="retour">
+
+← Retour à mon espace client
+
+</a>
+
+</div>
+
+
+<script type="module">
+
+import {
+  initializeApp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
 import {
   getAuth,
   onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 
 import {
   getFirestore,
+  doc,
+  onSnapshot,
+  runTransaction,
   collection,
-  addDoc,
   serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
-  authDomain: "pbgcboost.firebaseapp.com",
-  projectId: "pbgcboost",
-  storageBucket: "pbgcboost.firebasestorage.app",
-  messagingSenderId: "1086041371195",
-  appId: "1:1086041371195:web:3ade541590b85a5595221e"
+
+  apiKey:
+    "AIzaSyBhRZ1j_cPbsQoMromaM2FlomLGDs5BwEQ",
+
+  authDomain:
+    "pbgcboost.firebaseapp.com",
+
+  projectId:
+    "pbgcboost",
+
+  storageBucket:
+    "pbgcboost.firebasestorage.app",
+
+  messagingSenderId:
+    "1086041371195",
+
+  appId:
+    "1:1086041371195:web:3ade541590b85a5595221e"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+
+const app =
+  initializeApp(firebaseConfig);
+
+
+const auth =
+  getAuth(app);
+
+
+const db =
+  getFirestore(app);
+
 
 let currentUser = null;
 
-/* Vérifier correctement l'état de connexion Firebase */
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-});
+let soldeActuel = 0;
 
-/* TARIFS */
+
+const soldeElement =
+  document.getElementById("solde");
+
+
+const prixElement =
+  document.getElementById("prix");
+
+
+const serviceElement =
+  document.getElementById("service");
+
+
+const quantiteElement =
+  document.getElementById("quantite");
+
+
+const lienElement =
+  document.getElementById("lien");
+
+
+const bouton =
+  document.getElementById("envoyer");
+
+
+
+/* =========================
+   TARIFS
+========================= */
+
 const prix = {
+
   "Facebook J'aime": {
+
     "200": 300,
     "500": 700,
     "1000": 1300,
     "2000": 2500,
     "10000": 11000
+
   },
 
+
   "Facebook Abonnés": {
+
     "200": 500,
     "500": 1000,
     "1000": 2000,
     "2000": 4000,
     "10000": 20000
+
   },
 
+
   "TikTok J'aime": {
+
     "200": 500,
     "500": 1100,
     "1000": 2000,
     "2000": 4000
+
   },
 
+
   "TikTok Abonnés": {
+
     "200": 600,
     "500": 1300,
     "1000": 2600,
     "2000": 5200
+
   },
+
 
   "YouTube": {
+
     "200": 1000,
     "500": 2500,
     "1000": 5000
+
   },
+
 
   "Instagram": {
+
     "200": 1000,
     "500": 2500,
     "1000": 5000
+
   },
 
+
   "Telegram": {
+
     "200": 1000,
     "500": 2500,
     "1000": 5000
+
   }
+
 };
 
-/* CALCUL DU PRIX */
-function calculPrix() {
+
+
+/* =========================
+   CALCUL DU PRIX
+========================= */
+
+function calculPrix(){
 
   const service =
-    document.getElementById("service").value;
+    serviceElement.value;
 
   const quantite =
-    document.getElementById("quantite").value;
+    quantiteElement.value;
+
 
   let montant = 0;
 
-  if (prix[service] && prix[service][quantite]) {
-    montant = prix[service][quantite];
+
+  if(
+    prix[service] &&
+    prix[service][quantite]
+  ){
+
+    montant =
+      prix[service][quantite];
+
   }
 
-  document.getElementById("prix").textContent = montant;
+
+  prixElement.textContent =
+    montant.toLocaleString("fr-FR");
+
 }
 
-document
-  .getElementById("service")
-  .addEventListener("change", calculPrix);
 
-document
-  .getElementById("quantite")
-  .addEventListener("change", calculPrix);
+serviceElement.addEventListener(
+  "change",
+  calculPrix
+);
 
 
-/* ENVOI DE LA COMMANDE */
-document
-  .getElementById("envoyer")
-  .addEventListener("click", async () => {
+quantiteElement.addEventListener(
+  "change",
+  calculPrix
+);
 
-    /* Attendre que Firebase confirme l'utilisateur */
-    const user = currentUser;
 
-    if (!user) {
-      alert("Veuillez vous connecter.");
+
+/* =========================
+   CONNEXION + SOLDE
+========================= */
+
+onAuthStateChanged(
+  auth,
+  (user) => {
+
+    if(!user){
+
+      currentUser = null;
+
+      soldeElement.textContent =
+        "0";
+
+      bouton.disabled = true;
+
+      alert(
+        "Veuillez vous connecter avant de passer une commande."
+      );
+
       return;
     }
+
+
+    currentUser = user;
+
+    bouton.disabled = false;
+
+
+    const userRef =
+      doc(
+        db,
+        "users",
+        user.uid
+      );
+
+
+    onSnapshot(
+      userRef,
+
+      (snapshot) => {
+
+        if(snapshot.exists()){
+
+          const data =
+            snapshot.data();
+
+
+          soldeActuel =
+            Number(data.solde || 0);
+
+        }else{
+
+          soldeActuel = 0;
+
+        }
+
+
+        soldeElement.textContent =
+          soldeActuel.toLocaleString("fr-FR");
+
+      },
+
+      (error) => {
+
+        console.error(
+          "Erreur solde :",
+          error
+        );
+
+        soldeActuel = 0;
+
+        soldeElement.textContent =
+          "0";
+
+      }
+    );
+
+  }
+);
+
+
+
+/* =========================
+   ENVOI DE LA COMMANDE
+========================= */
+
+bouton.addEventListener(
+  "click",
+  async () => {
+
+    if(!currentUser){
+
+      alert(
+        "❌ Veuillez vous connecter."
+      );
+
+      return;
+    }
+
 
     const service =
-      document.getElementById("service").value;
+      serviceElement.value;
+
 
     const quantite =
-      document.getElementById("quantite").value;
+      quantiteElement.value;
+
 
     const lien =
-      document.getElementById("lien").value;
+      lienElement.value.trim();
 
-    const paiement =
-      document.getElementById("paiement").value;
-
-    const transaction =
-      document.getElementById("transaction").value;
 
     const montant =
-      document.getElementById("prix").textContent;
+      Number(
+        prix[service]?.[quantite] || 0
+      );
 
 
-    /* Vérification des champs */
-    if (!service || !quantite || !lien || !transaction) {
-      alert("Veuillez remplir tous les champs.");
+    /* Vérification */
+
+    if(!service){
+
+      alert(
+        "❌ Choisissez un service."
+      );
+
       return;
     }
 
 
-    try {
+    if(!quantite){
 
-      /* 1. ENREGISTRER UNE SEULE FOIS DANS FIRESTORE */
-      await addDoc(collection(db, "commandes"), {
+      alert(
+        "❌ Choisissez une quantité."
+      );
 
-        uid: user.uid,
-
-        email: user.email,
-
-        service: service,
-
-        quantite: quantite,
-
-        prix: montant,
-
-        lien: lien,
-
-        paiement: paiement,
-
-        transaction: transaction,
-
-        statut: "En attente",
-
-        date: serverTimestamp()
-
-      });
+      return;
+    }
 
 
-      /* 2. ENVOYER UNE SEULE NOTIFICATION À PIPEDREAM */
-      try {
+    if(!lien){
+
+      alert(
+        "❌ Entrez le lien à booster."
+      );
+
+      return;
+    }
+
+
+    if(montant <= 0){
+
+      alert(
+        "❌ Prix invalide pour ce service."
+      );
+
+      return;
+    }
+
+
+    if(soldeActuel < montant){
+
+      alert(
+        "❌ Solde insuffisant.\n\n" +
+
+        "Prix : " +
+        montant.toLocaleString("fr-FR") +
+        " FCFA\n" +
+
+        "Votre solde : " +
+        soldeActuel.toLocaleString("fr-FR") +
+        " FCFA"
+      );
+
+      return;
+    }
+
+
+    const confirmation =
+      confirm(
+
+        "Confirmer la commande ?\n\n" +
+
+        "Service : " +
+        service +
+
+        "\nQuantité : " +
+        quantite +
+
+        "\nPrix : " +
+        montant.toLocaleString("fr-FR") +
+
+        " FCFA\n\n" +
+
+        "Votre solde sera débité automatiquement."
+
+      );
+
+
+    if(!confirmation){
+
+      return;
+
+    }
+
+
+    bouton.disabled = true;
+
+    bouton.textContent =
+      "⏳ Traitement...";
+
+
+    try{
+
+      let nouveauSolde = 0;
+
+
+      await runTransaction(
+        db,
+
+        async (transaction) => {
+
+          const userRef =
+            doc(
+              db,
+              "users",
+              currentUser.uid
+            );
+
+
+          const commandeRef =
+            doc(
+              collection(
+                db,
+                "commandes"
+              )
+            );
+
+
+          const userSnap =
+            await transaction.get(
+              userRef
+            );
+
+
+          if(!userSnap.exists()){
+
+            throw new Error(
+              "Compte client introuvable."
+            );
+
+          }
+
+
+          const userData =
+            userSnap.data();
+
+
+          const solde =
+            Number(
+              userData.solde || 0
+            );
+
+
+          if(solde < montant){
+
+            throw new Error(
+              "Solde insuffisant."
+            );
+
+          }
+
+
+          nouveauSolde =
+            solde - montant;
+
+
+          /* Déduction du solde */
+
+          transaction.update(
+            userRef,
+            {
+              solde: nouveauSolde
+            }
+          );
+
+
+          /* Création de la commande */
+
+          transaction.set(
+            commandeRef,
+            {
+
+              uid:
+                currentUser.uid,
+
+              email:
+                currentUser.email || "",
+
+              service:
+                service,
+
+              quantite:
+                quantite,
+
+              prix:
+                montant,
+
+              lien:
+                lien,
+
+              paiement:
+                "Solde PBGCboost",
+
+              transaction:
+                "Paiement par solde",
+
+              statut:
+                "En attente",
+
+              date:
+                serverTimestamp()
+
+            }
+          );
+
+        }
+      );
+
+
+      /* Notification Telegram */
+
+      try{
 
         await fetch(
           "https://eoi71i1ly0qx7m1.m.pipedream.net",
           {
-            method: "POST",
 
-            headers: {
-              "Content-Type": "application/json"
+            method:
+              "POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
             },
 
-            body: JSON.stringify({
+            body:
+              JSON.stringify({
 
-              service: service,
+                service:
+                  service,
 
-              quantite: quantite,
+                quantite:
+                  quantite,
 
-              lien: lien,
+                lien:
+                  lien,
 
-              email: user.email,
+                email:
+                  currentUser.email || "",
 
-              paiement: paiement,
+                paiement:
+                  "Solde PBGCboost",
 
-              transaction: transaction,
+                transaction:
+                  "Paiement par solde",
 
-              statut: "En attente"
+                statut:
+                  "En attente"
 
-            })
+              })
+
           }
         );
 
-      } catch (notificationError) {
+      }catch(notificationError){
 
         console.error(
-          "Erreur de notification Telegram :",
+          "Erreur Telegram :",
           notificationError
         );
 
       }
 
 
-      /* 3. CONFIRMATION */
-      alert("Commande enregistrée avec succès !");
-
-      window.location.href = "espace-client.html";
-
-
-    } catch (e) {
-
       alert(
-        "Erreur lors de l'enregistrement : " +
-        e.message
+
+        "✅ Commande enregistrée !\n\n" +
+
+        "Montant débité : " +
+
+        montant.toLocaleString("fr-FR") +
+
+        " FCFA\n\n" +
+
+        "Nouveau solde : " +
+
+        nouveauSolde.toLocaleString("fr-FR") +
+
+        " FCFA"
+
       );
 
-      console.error(e);
+
+      window.location.href =
+        "espace-client.html";
+
+
+    }catch(error){
+
+      console.error(
+        "Erreur commande :",
+        error
+      );
+
+
+      alert(
+        "❌ Impossible de passer la commande.\n\n" +
+        (error.message ||
+         "Erreur inconnue.")
+      );
+
+
+      bouton.disabled =
+        false;
+
+      bouton.textContent =
+        "💰 Payer avec mon solde";
 
     }
 
-  });
+  }
+);
 
- </script>
+</script>
 
 </body>
-                          </html>
+                         </html>
